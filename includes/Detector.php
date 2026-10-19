@@ -91,7 +91,7 @@ class Detector
         $host   = strtolower(rtrim($parts['host'], '.'));
         $scheme = strtolower($parts['scheme']);
         $path   = ($parts['path'] ?? '') . (isset($parts['query']) ? '?' . $parts['query'] : '');
-        $domain = $this->registrableDomain($host);
+        $domain = self::registrableDomain($host);
         $isIp   = (bool) filter_var(trim($host, '[]'), FILTER_VALIDATE_IP);
 
         // Known lists come first: a blacklist match is final, a whitelist match is trusted
@@ -244,7 +244,7 @@ class Detector
     /**
      * "login.paypal.com" -> "paypal.com", "shop.site.com.gh" -> "site.com.gh"
      */
-    private function registrableDomain(string $host): string
+    public static function registrableDomain(string $host): string
     {
         if (filter_var(trim($host, '[]'), FILTER_VALIDATE_IP)) {
             return $host;

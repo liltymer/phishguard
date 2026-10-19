@@ -28,12 +28,14 @@ phishguard/
 ├── database/phishguard.sql
 ├── includes/
 │   ├── Detector.php       Detection engine (all phishing rules)
+│   ├── functions.php      Shared helpers (escaping, verdict labels, time ago)
 │   ├── header.php
 │   └── footer.php
 ├── tests/detector_test.php
 ├── index.php              Home page with URL scanner
 ├── scan.php               Runs the detector and saves the scan
-└── result.php             Shows the verdict and reasons
+├── result.php             Risk gauge, URL breakdown and reasons
+└── history.php            Past scans with stats, search, filter and pages
 ```
 
 ## How detection works
@@ -74,7 +76,7 @@ C:\xampp\php\php.exe tests\detector_test.php
 
 - [x] Phase 1: Project setup, database, home page
 - [x] Phase 2: Detection engine
-- [ ] Phase 3: Results page and scan history
+- [x] Phase 3: Results page and scan history
 - [ ] Phase 4: URL reporting, blacklist and whitelist
 - [ ] Phase 5: Admin panel
 - [ ] Phase 6: Testing and final polish

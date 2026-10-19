@@ -1,3 +1,26 @@
+// Animate the risk score gauge on the result page
+document.addEventListener('DOMContentLoaded', () => {
+    const gauge = document.querySelector('.gauge');
+    if (!gauge) return;
+
+    const score = Number(gauge.dataset.score);
+    const fill = gauge.querySelector('.gauge-fill');
+    const value = gauge.querySelector('.gauge-value');
+    const circumference = 2 * Math.PI * 52;
+
+    requestAnimationFrame(() => {
+        fill.style.strokeDashoffset = circumference * (1 - score / 100);
+    });
+
+    const start = performance.now();
+    const tick = (now) => {
+        const progress = Math.min((now - start) / 1000, 1);
+        value.textContent = Math.round(score * progress);
+        if (progress < 1) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+});
+
 // Client-side check before the URL is sent to the server
 document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('scanForm');
