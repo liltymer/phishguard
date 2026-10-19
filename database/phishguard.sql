@@ -28,6 +28,7 @@ CREATE TABLE IF NOT EXISTS blacklist (
 CREATE TABLE IF NOT EXISTS whitelist (
     id          INT AUTO_INCREMENT PRIMARY KEY,
     domain      VARCHAR(255) NOT NULL UNIQUE,
+    note        VARCHAR(255),
     added_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -55,7 +56,17 @@ CREATE TABLE IF NOT EXISTS admins (
     id            INT AUTO_INCREMENT PRIMARY KEY,
     username      VARCHAR(50) NOT NULL UNIQUE,
     password_hash VARCHAR(255) NOT NULL,
+    last_login_at TIMESTAMP NULL,
     created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Failed admin logins, used to lock out password guessing
+CREATE TABLE IF NOT EXISTS login_attempts (
+    id           INT AUTO_INCREMENT PRIMARY KEY,
+    ip_address   VARCHAR(45) NOT NULL,
+    username     VARCHAR(50),
+    attempted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_attempts_ip_time (ip_address, attempted_at)
 );
 
 -- Starter whitelist of well-known legitimate domains

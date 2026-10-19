@@ -17,6 +17,17 @@ risk score with a verdict: **Safe**, **Suspicious** or **Phishing**.
 3. Open phpMyAdmin (`http://localhost/phpmyadmin`) and import `database/phishguard.sql`.
 4. Visit `http://localhost/phishguard`.
 
+### Creating an admin account
+
+There is no default admin password. Create an account from the command line
+(run the same command again later to reset a password):
+
+```
+C:\xampp\php\php.exe tools\create_admin.php <username> <password>
+```
+
+Then log in at `http://localhost/phishguard/admin` (also linked in the site footer).
+
 ### Upgrading an existing database
 
 If you imported the database before a feature was added, run the matching files in
@@ -26,6 +37,13 @@ If you imported the database before a feature was added, run the matching files 
 
 ```
 phishguard/
+├── admin/
+│   ├── login.php          Admin login with lockout
+│   ├── index.php          Dashboard: statistics and 7-day chart
+│   ├── reports.php        Review user reports (confirm or reject)
+│   ├── lists.php          Manage the blacklist and trusted list
+│   ├── account.php        Change password
+│   └── logout.php
 ├── assets/
 │   ├── css/style.css
 │   └── js/main.js
@@ -35,10 +53,11 @@ phishguard/
 │   └── migrations/        Upgrades for existing databases
 ├── includes/
 │   ├── Detector.php       Detection engine (all phishing rules)
-│   ├── functions.php      Shared helpers (escaping, verdict labels, time ago)
-│   ├── header.php
-│   └── footer.php
+│   ├── auth.php           Admin login, lockout and session timeout
+│   ├── functions.php      Shared helpers (escaping, CSRF, flash messages)
+│   ├── header.php, footer.php, admin_header.php
 ├── tests/detector_test.php
+├── tools/create_admin.php Command-line admin account tool
 ├── index.php              Home page with URL scanner
 ├── scan.php               Runs the detector and saves the scan
 ├── result.php             Risk gauge, URL breakdown and reasons
@@ -53,6 +72,23 @@ phishguard/
 - Forms that change data carry a CSRF token.
 - The report form has a hidden spam trap field and a limit of 5 reports per hour per IP address.
 - Duplicate pending reports for the same URL are not stored twice.
+- Admin passwords are stored with `password_hash` (bcrypt), never in plain text.
+- Admin login locks for 15 minutes after 5 failed attempts and gives the same message for
+  unknown users and wrong passwords.
+- The session ID is regenerated on login, and admins are logged out after 30 minutes of inactivity.
+- Logout requires a POST request with a CSRF token.
+- The `config`, `includes`, `database`, `tests` and `tools` folders are blocked from browser access
+  with `.htaccess`.
+
+## Admin workflow
+
+1. Users report a URL as phishing or as a false alarm.
+2. The admin reviews it under **Reports** and chooses to apply the decision to the exact host
+   (for example `login.evil.xyz`) or the whole domain (`evil.xyz` and all its subdomains).
+3. Confirming a phishing report adds the domain to the **blacklist**; confirming a false alarm adds it
+   to the **trusted list**. The domain is removed from the opposite list, and all other pending reports
+   for that domain are closed.
+4. Rejecting a report changes no lists.
 
 ## How detection works
 
@@ -94,5 +130,5 @@ C:\xampp\php\php.exe tests\detector_test.php
 - [x] Phase 2: Detection engine
 - [x] Phase 3: Results page and scan history
 - [x] Phase 4: URL reporting, blacklist and whitelist
-- [ ] Phase 5: Admin panel
+- [x] Phase 5: Admin panel
 - [ ] Phase 6: Testing and final polish

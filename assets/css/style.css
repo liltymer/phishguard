@@ -160,6 +160,161 @@ main {
     overflow: hidden;
 }
 
+.footer-link {
+    color: rgba(255, 255, 255, 0.7);
+    text-decoration: none;
+}
+
+.footer-link:hover {
+    color: var(--accent);
+}
+
+/* Admin area */
+.bg-accent-soft {
+    background: rgba(245, 165, 36, 0.2);
+    color: var(--accent);
+    font-weight: 600;
+}
+
+.login-page {
+    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
+}
+
+.login-page main {
+    min-height: 100vh;
+}
+
+.login-card {
+    width: 100%;
+    max-width: 400px;
+    border-radius: 16px;
+}
+
+.stat-icon {
+    font-size: 1.5rem;
+    color: #adb5bd;
+}
+
+.report-reason {
+    background: #f8f9fa;
+    border-left: 3px solid #ced4da;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0 6px 6px 0;
+}
+
+/* Dashboard chart: stacked bars, 2px gaps between segments, rounded top */
+.chart {
+    position: relative;
+    display: flex;
+    align-items: stretch;
+    gap: 12px;
+    height: 240px;
+}
+
+/* Baseline drawn across all bars, just above the day labels */
+.chart::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 24px;
+    border-top: 1px solid #dee2e6;
+    pointer-events: none;
+}
+
+.chart-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 0;
+    border-radius: 6px;
+    outline: none;
+    cursor: default;
+}
+
+.chart-col:hover,
+.chart-col:focus-visible {
+    background: rgba(15, 27, 45, 0.04);
+}
+
+.chart-col:focus-visible {
+    box-shadow: 0 0 0 2px var(--accent);
+}
+
+.chart-total {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #495057;
+    height: 1.25rem;
+}
+
+.chart-track {
+    flex: 1;
+    width: 100%;
+    max-width: 44px;
+    display: flex;
+    align-items: flex-end;
+}
+
+.chart-stack {
+    width: 100%;
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 2px;
+    border-radius: 4px 4px 0 0;
+    overflow: hidden;
+}
+
+.seg {
+    flex-basis: 0;
+    min-height: 3px;
+}
+
+.seg-safe, .swatch-safe { background: #198754; }
+.seg-suspicious, .swatch-suspicious { background: #e0a800; }
+.seg-phishing, .swatch-phishing { background: #dc3545; }
+
+.chart-day {
+    font-size: 0.75rem;
+    color: #6c757d;
+    height: 24px;
+    line-height: 24px;
+}
+
+.swatch {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    vertical-align: baseline;
+}
+
+.chart-tip {
+    position: absolute;
+    z-index: 5;
+    pointer-events: none;
+    background: #fff;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    box-shadow: 0 4px 16px rgba(15, 27, 45, 0.12);
+    padding: 8px 10px;
+    font-size: 0.8rem;
+    min-width: 140px;
+    color: #212529;
+}
+
+.chart-tip strong {
+    display: block;
+    margin-bottom: 4px;
+}
+
+.chart-tip div {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+}
+
 /* History page */
 .stat-card {
     border: none;

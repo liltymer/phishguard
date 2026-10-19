@@ -1,6 +1,7 @@
 <?php
 $pageTitle = $pageTitle ?? 'PhishGuard';
 $activePage = $activePage ?? '';
+$base = $base ?? '';   // '../' for pages inside a subfolder such as admin/
 
 $navItems = [
     'scan'    => ['href' => 'index.php',   'label' => 'Scan URL'],
@@ -17,12 +18,12 @@ $navItems = [
     <title><?= htmlspecialchars($pageTitle) ?></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
-    <link href="assets/css/style.css" rel="stylesheet">
+    <link href="<?= $base ?>assets/css/style.css" rel="stylesheet">
 </head>
 <body>
 <nav class="navbar navbar-expand-lg navbar-dark bg-navy">
     <div class="container">
-        <a class="navbar-brand fw-bold" href="index.php">
+        <a class="navbar-brand fw-bold" href="<?= $base ?>index.php">
             <i class="bi bi-shield-lock-fill text-accent"></i> PhishGuard
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"
@@ -33,7 +34,7 @@ $navItems = [
             <ul class="navbar-nav ms-auto">
                 <?php foreach ($navItems as $key => $item): ?>
                     <li class="nav-item">
-                        <a class="nav-link <?= $activePage === $key ? 'active' : '' ?>" href="<?= $item['href'] ?>"
+                        <a class="nav-link <?= $activePage === $key ? 'active' : '' ?>" href="<?= $base . $item['href'] ?>"
                             <?= $activePage === $key ? 'aria-current="page"' : '' ?>><?= $item['label'] ?></a>
                     </li>
                 <?php endforeach; ?>

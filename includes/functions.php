@@ -41,6 +41,52 @@ function verifyCsrf(?string $token): bool
     return is_string($token) && !empty($_SESSION['csrf_token']) && hash_equals($_SESSION['csrf_token'], $token);
 }
 
+// One-time message shown on the next page, e.g. after a redirect
+function setFlash(string $type, string $message): void
+{
+    startSession();
+    $_SESSION['flash'] = ['type' => $type, 'message' => $message];
+}
+
+function flashMessage(): string
+{
+    startSession();
+
+    if (empty($_SESSION['flash'])) {
+        return '';
+    }
+
+    $flash = $_SESSION['flash'];
+    unset($_SESSION['flash']);
+    $icon = $flash['type'] === 'success' ? 'bi-check-circle-fill' : 'bi-exclamation-triangle-fill';
+
+    return '<div class="alert alert-' . e($flash['type']) . ' d-flex gap-2" role="alert">'
+        . '<i class="bi ' . $icon . '"></i><div>' . e($flash['message']) . '</div></div>';
+}
+
+/**
+ * Turn admin input such as "https://www.Evil.com/login" into "www.evil.com".
+ * Returns null when the input is not a valid domain name or IP address.
+ */
+function cleanDomain(string $input): ?string
+{
+    $value = strtolower(trim($input));
+
+    if (!preg_match('#^[a-z][a-z0-9+.-]*://#', $value)) {
+        $value = 'http://' . $value;
+    }
+
+    $host = parse_url($value, PHP_URL_HOST);
+    if (!is_string($host)) {
+        return null;
+    }
+
+    $host = rtrim($host, '.');
+    $isDomain = preg_match('/^(?=.{4,253}$)([a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z0-9-]{2,63}$/', $host);
+
+    return ($isDomain || filter_var($host, FILTER_VALIDATE_IP)) ? $host : null;
+}
+
 // Label, Bootstrap colour, icon and advice for each verdict
 function verdictInfo(string $verdict): array
 {
