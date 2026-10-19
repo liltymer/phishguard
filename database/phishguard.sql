@@ -32,12 +32,22 @@ CREATE TABLE IF NOT EXISTS whitelist (
 );
 
 -- URLs reported by users for admin review
+--   phishing:       the user believes the link is phishing (confirmed reports feed the blacklist)
+--   false_positive: the user believes a genuine site was flagged (confirmed reports feed the whitelist)
 CREATE TABLE IF NOT EXISTS reports (
     id          INT AUTO_INCREMENT PRIMARY KEY,
     url         TEXT NOT NULL,
+    domain      VARCHAR(255) NOT NULL,
+    type        ENUM('phishing', 'false_positive') NOT NULL DEFAULT 'phishing',
     reason      VARCHAR(500),
+    scan_id     INT NULL,
+    ip_address  VARCHAR(45),
     status      ENUM('pending', 'confirmed', 'rejected') DEFAULT 'pending',
-    created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    reviewed_at TIMESTAMP NULL,
+    created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_reports_domain (domain),
+    INDEX idx_reports_status (status),
+    CONSTRAINT fk_reports_scan FOREIGN KEY (scan_id) REFERENCES scans (id) ON DELETE SET NULL
 );
 
 -- Admin accounts (password stored as a hash, never plain text)

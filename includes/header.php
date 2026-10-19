@@ -1,4 +1,14 @@
-<?php $pageTitle = $pageTitle ?? 'PhishGuard'; ?>
+<?php
+$pageTitle = $pageTitle ?? 'PhishGuard';
+$activePage = $activePage ?? '';
+
+$navItems = [
+    'scan'    => ['href' => 'index.php',   'label' => 'Scan URL'],
+    'history' => ['href' => 'history.php', 'label' => 'History'],
+    'report'  => ['href' => 'report.php',  'label' => 'Report URL'],
+    'about'   => ['href' => 'about.php',   'label' => 'How It Works'],
+];
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -15,15 +25,18 @@
         <a class="navbar-brand fw-bold" href="index.php">
             <i class="bi bi-shield-lock-fill text-accent"></i> PhishGuard
         </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"
+                aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="mainNav">
             <ul class="navbar-nav ms-auto">
-                <li class="nav-item"><a class="nav-link" href="index.php">Scan URL</a></li>
-                <li class="nav-item"><a class="nav-link" href="history.php">History</a></li>
-                <li class="nav-item"><a class="nav-link" href="report.php">Report URL</a></li>
-                <li class="nav-item"><a class="nav-link" href="about.php">How It Works</a></li>
+                <?php foreach ($navItems as $key => $item): ?>
+                    <li class="nav-item">
+                        <a class="nav-link <?= $activePage === $key ? 'active' : '' ?>" href="<?= $item['href'] ?>"
+                            <?= $activePage === $key ? 'aria-current="page"' : '' ?>><?= $item['label'] ?></a>
+                    </li>
+                <?php endforeach; ?>
             </ul>
         </div>
     </div>

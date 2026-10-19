@@ -1,5 +1,6 @@
 <?php
-$pageTitle = 'PhishGuard — Phishing URL Detection';
+$pageTitle = 'PhishGuard | Phishing URL Detection';
+$activePage = 'scan';
 require 'includes/header.php';
 ?>
 

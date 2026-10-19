@@ -151,6 +151,15 @@ main {
     min-width: 62px;
 }
 
+/* Report page: spam trap field, hidden from people but visible to bots */
+.hp-field {
+    position: absolute;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+}
+
 /* History page */
 .stat-card {
     border: none;

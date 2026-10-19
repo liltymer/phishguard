@@ -21,6 +21,17 @@ document.addEventListener('DOMContentLoaded', () => {
     requestAnimationFrame(tick);
 });
 
+// Live character counter for the report details box
+document.addEventListener('DOMContentLoaded', () => {
+    const reason = document.getElementById('reason');
+    const counter = document.getElementById('reasonCount');
+    if (!reason || !counter) return;
+
+    reason.addEventListener('input', () => {
+        counter.textContent = reason.value.length;
+    });
+});
+
 // Client-side check before the URL is sent to the server
 document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('scanForm');

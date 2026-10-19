@@ -53,7 +53,8 @@ function pageLink(array $changes): string
     return 'history.php?' . http_build_query(array_filter($query, fn($v) => $v !== '' && $v !== 'all'));
 }
 
-$pageTitle = 'Scan History — PhishGuard';
+$pageTitle = 'Scan History | PhishGuard';
+$activePage = 'history';
 require 'includes/header.php';
 ?>
 
@@ -132,7 +133,7 @@ require 'includes/header.php';
 
         <div class="d-flex flex-wrap justify-content-between align-items-center mt-3 gap-2">
             <span class="text-muted small">
-                Showing <?= $offset + 1 ?>–<?= $offset + count($scans) ?> of <?= $matching ?>
+                Showing <?= $offset + 1 ?> to <?= $offset + count($scans) ?> of <?= $matching ?>
             </span>
             <?php if ($pages > 1): ?>
                 <nav>

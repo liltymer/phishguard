@@ -23,7 +23,14 @@ $realDomain = Detector::registrableDomain(strtolower($host));
 // Split the host so the real domain can be highlighted, e.g. paypal.com.[evil.xyz]
 $prefix = substr($host, 0, strlen($host) - strlen($realDomain));
 
-$pageTitle = 'Scan Result — PhishGuard';
+// Other users may already have reported this domain as phishing
+$pending = db()->prepare("SELECT COUNT(*) FROM reports WHERE domain = ? AND type = 'phishing' AND status = 'pending'");
+$pending->execute([strtolower($host)]);
+$pendingReports = (int) $pending->fetchColumn();
+
+$reportLink = fn(string $type) => 'report.php?' . http_build_query(['url' => $scan['url'], 'type' => $type, 'scan' => $scan['id']]);
+
+$pageTitle = 'Scan Result | PhishGuard';
 require 'includes/header.php';
 ?>
 
@@ -60,6 +67,16 @@ require 'includes/header.php';
                 </div>
             </div>
 
+            <?php if ($pendingReports > 0): ?>
+                <div class="alert alert-warning d-flex gap-2 mt-4 mb-0" role="alert">
+                    <i class="bi bi-people-fill"></i>
+                    <div>
+                        This domain has been reported as phishing by other users
+                        (<?= $pendingReports ?> report<?= $pendingReports > 1 ? 's' : '' ?>) and is under review.
+                    </div>
+                </div>
+            <?php endif; ?>
+
             <div class="card mt-4 border-0 shadow-sm">
                 <div class="card-body p-4">
                     <h2 class="h6 fw-bold mb-3"><i class="bi bi-diagram-3"></i> URL breakdown</h2>
@@ -69,7 +86,7 @@ require 'includes/header.php';
                     <dl class="row small mb-0">
                         <dt class="col-sm-3">Real website</dt>
                         <dd class="col-sm-9"><span class="url-part-domain"><?= e($realDomain) ?></span>
-                            <span class="text-muted">&mdash; this is who you are actually connecting to</span></dd>
+                            <span class="text-muted">(the website you would actually connect to)</span></dd>
                         <dt class="col-sm-3">Connection</dt>
                         <dd class="col-sm-9">
                             <?php if ($parts['scheme'] === 'https'): ?>
@@ -108,6 +125,27 @@ require 'includes/header.php';
                     <?php endforeach; ?>
                 </ul>
             <?php endif; ?>
+
+            <div class="card border-0 bg-light mt-4">
+                <div class="card-body p-4 d-md-flex align-items-center justify-content-between gap-3">
+                    <div class="mb-3 mb-md-0">
+                        <h2 class="h6 fw-bold mb-1">Think this result is wrong?</h2>
+                        <p class="small text-muted mb-0">Your report helps us improve detection for everyone.</p>
+                    </div>
+                    <div class="d-flex flex-wrap gap-2 flex-shrink-0">
+                        <?php if ($scan['verdict'] !== 'phishing'): ?>
+                            <a href="<?= e($reportLink('phishing')) ?>" class="btn btn-sm btn-outline-danger">
+                                <i class="bi bi-flag"></i> Report as phishing
+                            </a>
+                        <?php endif; ?>
+                        <?php if ($scan['verdict'] !== 'safe'): ?>
+                            <a href="<?= e($reportLink('false_positive')) ?>" class="btn btn-sm btn-outline-success">
+                                <i class="bi bi-hand-thumbs-up"></i> Report a false alarm
+                            </a>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </div>
 
             <div class="d-flex flex-wrap justify-content-center gap-2 mt-4">
                 <a href="index.php" class="btn btn-accent px-4"><i class="bi bi-arrow-repeat"></i> Scan another URL</a>
