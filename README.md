@@ -26,14 +26,54 @@ phishguard/
 │   └── js/main.js
 ├── config/db.php          Database connection
 ├── database/phishguard.sql
-├── includes/              Shared header and footer
-└── index.php              Home page with URL scanner
+├── includes/
+│   ├── Detector.php       Detection engine (all phishing rules)
+│   ├── header.php
+│   └── footer.php
+├── tests/detector_test.php
+├── index.php              Home page with URL scanner
+├── scan.php               Runs the detector and saves the scan
+└── result.php             Shows the verdict and reasons
+```
+
+## How detection works
+
+Each rule that matches adds points to a risk score (capped at 100):
+
+| Score | Verdict |
+|-------|---------|
+| 0–29 | Safe |
+| 30–59 | Suspicious |
+| 60–100 | Phishing |
+
+| Check | Points |
+|-------|--------|
+| Domain on blacklist | 100 |
+| Misspelt brand (e.g. `paypa1.com`) | 55 |
+| IP address instead of a domain | 45 |
+| Brand name on a domain it doesn't own | 35 |
+| `@` symbol before the real host | 30 |
+| Punycode (`xn--`) lookalike characters | 25 |
+| Three or more subdomains | 20 |
+| Link shortener | 20 |
+| Trick words (login, verify, secure…) | up to 20, +10 if in the domain name |
+| Risky TLD (`.tk`, `.xyz`, `.top`…) | 15 |
+| Hyphens in the domain name | 5–15 |
+| Very long URL | 8–15 |
+| No HTTPS, unusual port, `//` redirect, heavy `%` encoding | 10 each |
+
+Domains on the whitelist (e.g. `google.com`) are trusted and score 0.
+
+Run the detector tests with:
+
+```
+C:\xampp\php\php.exe tests\detector_test.php
 ```
 
 ## Progress
 
 - [x] Phase 1: Project setup, database, home page
-- [ ] Phase 2: Detection engine
+- [x] Phase 2: Detection engine
 - [ ] Phase 3: Results page and scan history
 - [ ] Phase 4: URL reporting, blacklist and whitelist
 - [ ] Phase 5: Admin panel

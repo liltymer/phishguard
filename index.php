@@ -22,7 +22,9 @@ require 'includes/header.php';
                             <i class="bi bi-search"></i> Scan
                         </button>
                     </div>
-                    <div id="urlError" class="text-warning small mt-2 text-start d-none"></div>
+                    <div id="urlError" class="text-warning small mt-2 text-start <?= isset($_GET['error']) ? '' : 'd-none' ?>">
+                        <?= isset($_GET['error']) ? 'That does not look like a valid web address. Please check it and try again.' : '' ?>
+                    </div>
                 </form>
             </div>
         </div>

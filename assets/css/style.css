@@ -64,3 +64,13 @@ main {
     font-size: 2rem;
     color: var(--accent-dark);
 }
+
+.result-card {
+    border-width: 0 0 0 6px;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(15, 27, 45, 0.08);
+}
+
+.verdict-icon {
+    font-size: 4rem;
+}
