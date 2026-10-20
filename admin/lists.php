@@ -67,7 +67,7 @@ $stmt->execute(['%' . addcslashes($search, '%_\\') . '%']);
 $entries = $stmt->fetchAll();
 
 $current = $lists[$list];
-$pageTitle = $current['label'] . ' | PhishGuard Admin';
+$pageTitle = $current['label'] . ' | BaitCheck Admin';
 $activePage = 'lists';
 require '../includes/admin_header.php';
 ?>
@@ -80,7 +80,7 @@ require '../includes/admin_header.php';
             <a class="nav-link <?= $key === $list ? 'active' : '' ?>" href="lists.php?list=<?= $key ?>"
                 <?= $key === $list ? 'aria-current="page"' : '' ?>>
                 <i class="bi <?= $info['icon'] ?> text-<?= $info['color'] ?>"></i> <?= $info['label'] ?>
-                <span class="badge text-bg-light border ms-1"><?= $counts[$key] ?></span>
+                <span class="badge bg-body-tertiary text-body border ms-1"><?= $counts[$key] ?></span>
             </a>
         </li>
     <?php endforeach; ?>
@@ -88,7 +88,7 @@ require '../includes/admin_header.php';
 
 <div class="row g-4">
     <div class="col-lg-4">
-        <div class="card border-0 shadow-sm">
+        <div class="card">
             <div class="card-body p-4">
                 <h2 class="h6 fw-bold mb-2">Add to the <?= $current['label'] ?></h2>
                 <p class="small text-muted"><?= $current['help'] ?></p>
@@ -127,10 +127,10 @@ require '../includes/admin_header.php';
                 <?= $search !== '' ? 'No domains match your search.' : 'This list is empty.' ?>
             </div>
         <?php else: ?>
-            <div class="card border-0 shadow-sm">
+            <div class="card">
                 <div class="table-responsive">
                     <table class="table table-hover align-middle mb-0">
-                        <thead class="table-light">
+                        <thead>
                             <tr><th>Domain</th><th class="d-none d-md-table-cell">Note</th><th class="d-none d-sm-table-cell">Added</th><th></th></tr>
                         </thead>
                         <tbody>

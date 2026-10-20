@@ -16,7 +16,7 @@ if ((int) $pdo->query('SELECT COUNT(*) FROM admins')->fetchColumn() > 0) {
 
 if (!in_array($_SERVER['REMOTE_ADDR'] ?? '', ['127.0.0.1', '::1'], true)) {
     http_response_code(403);
-    exit('The first admin account can only be created on the computer running PhishGuard.');
+    exit('The first admin account can only be created on the computer running BaitCheck.');
 }
 
 $errors = [];
@@ -50,21 +50,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<?php
+    $pageTitle = 'Admin Setup | BaitCheck';
+    $base = '../';
+    require '../includes/head.php';
+    ?>
     <meta name="robots" content="noindex, nofollow">
-    <title>Admin Setup | PhishGuard</title>
-    <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
-    <link href="../assets/css/style.css" rel="stylesheet">
 </head>
 <body class="login-page">
+<div class="theme-toggle-corner"><?php require '../includes/theme_toggle.php'; ?></div>
 <main class="d-flex align-items-center justify-content-center px-3">
-    <div class="login-card card border-0 shadow">
+    <div class="login-card card">
         <div class="card-body p-4 p-md-5">
             <div class="text-center mb-4">
-                <i class="bi bi-person-plus-fill text-accent display-5"></i>
+                <span class="brand-mark brand-mark-lg"><i class="bi bi-person-plus-fill"></i></span>
                 <h1 class="h4 fw-bold mt-2 mb-1">Create Admin Account</h1>
                 <p class="text-muted small mb-0">No admin exists yet. Choose the login details for the first one.</p>
             </div>
@@ -97,5 +96,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
     </div>
 </main>
+<script src="../assets/js/main.js"></script>
 </body>
 </html>

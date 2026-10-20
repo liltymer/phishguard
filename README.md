@@ -1,6 +1,6 @@
-# PhishGuard: Phishing URL Detection System
+# BaitCheck: Phishing URL Detection System
 
-PhishGuard checks a link for phishing before you click it. Paste a URL and it runs 17 rule-based
+BaitCheck checks a link for phishing before you click it. Paste a URL and it runs 17 rule-based
 checks, gives a risk score from 0 to 100 with a verdict (**Safe**, **Suspicious** or **Phishing**) and
 explains exactly why. The link itself is never opened, so checking a dangerous link is always safe.
 
@@ -9,11 +9,16 @@ explains exactly why. The link itself is never opened, so checking a dangerous l
 ## Features
 
 **For everyone**
-- **URL scanner** with input validation and one-click example links.
-- **Detailed results:** animated risk gauge, a URL breakdown that highlights the real website behind
-  the link, and every warning sign ranked High, Medium or Low.
-- **Scan history** with totals, search, verdict filter and pagination.
-- **Report a URL** that PhishGuard missed, or a genuine site it flagged by mistake.
+- **URL scanner** with paste and clear buttons, input validation, one-click example links and a short
+  progress view that steps through the checks while the scan runs.
+- **Detailed results:** animated risk gauge, a score bar showing how each warning sign adds up, a URL
+  breakdown that highlights the real website behind the link, every warning sign ranked High, Medium
+  or Low, the list of checks the link passed, and "what to do now" advice for the verdict.
+- **Copy a safe link:** a "defanged" version (`hxxp://evil[.]com`) that can be shared in a warning
+  without anyone opening it by accident.
+- **Scan history** with summary cards that double as verdict filters, search with highlighted matches,
+  score bars, pagination, and a card layout on phones.
+- **Report a URL** that BaitCheck missed, or a genuine site it flagged by mistake.
 - **How It Works** page explaining every check, the scoring and how to stay safe.
 
 **For administrators**
@@ -22,6 +27,10 @@ explains exactly why. The link itself is never opened, so checking a dangerous l
   either the exact host or the whole domain.
 - **Domain list management:** add, search and remove blacklist and trusted-list entries.
 - **Account page** for changing the password.
+
+**Everywhere**
+- **Dark "Midnight Glow" design by default**, with a light mode one click away in the navbar (your choice is remembered).
+- Works on phones, respects the "reduce motion" setting, and supports keyboard navigation.
 
 ## Screenshots
 
@@ -33,13 +42,13 @@ explains exactly why. The link itself is never opened, so checking a dangerous l
 |---|---|
 | ![How it works](docs/screenshots/how-it-works.png) | ![Admin dashboard](docs/screenshots/admin-dashboard.png) |
 
-| Admin report review |
-|---|
-| ![Admin reports](docs/screenshots/admin-reports.png) |
+| Light mode | Admin report review |
+|---|---|
+| ![Result page in light mode](docs/screenshots/result-light.png) | ![Admin reports](docs/screenshots/admin-reports.png) |
 
 ## Tech stack
 
-- HTML5, CSS3, Bootstrap 5.3 and Bootstrap Icons
+- HTML5, CSS3, Bootstrap 5.3, Bootstrap Icons, and the Plus Jakarta Sans and JetBrains Mono fonts
 - JavaScript (no framework)
 - PHP 8 (served by Apache from XAMPP)
 - PostgreSQL, managed with pgAdmin 4
@@ -107,7 +116,7 @@ Each rule that matches adds points to a risk score, capped at 100. Domains on th
 The full list lives in `Detector::RULES` (`includes/Detector.php`). The How It Works page is built
 from that list, and the tests check that it matches what the engine really does.
 
-**Limitations.** PhishGuard inspects the link, not the website's content. A brand-new phishing site
+**Limitations.** BaitCheck inspects the link, not the website's content. A brand-new phishing site
 on an ordinary-looking domain may score low, and a genuine site can occasionally be flagged. User
 reports and the admin-managed lists exist to correct both cases.
 
@@ -177,7 +186,9 @@ phishguard/
 │   ├── Detector.php         Detection engine (all phishing rules)
 │   ├── auth.php             Admin login, lockout and session timeout
 │   ├── functions.php        Shared helpers (escaping, CSRF, flash messages)
-│   └── header.php, footer.php, admin_header.php
+│   ├── head.php             Shared <head>: fonts, styles, saved light/dark theme
+│   ├── steps.php            "How it works" steps (home and How It Works)
+│   └── header.php, footer.php, admin_header.php, theme_toggle.php
 ├── tests/detector_test.php
 ├── tools/create_admin.php   Command-line admin account tool
 ├── index.php                Home page with URL scanner

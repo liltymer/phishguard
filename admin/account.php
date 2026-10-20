@@ -44,7 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-$pageTitle = 'Account | PhishGuard Admin';
+$pageTitle = 'Account | BaitCheck Admin';
 $activePage = 'account';
 require '../includes/admin_header.php';
 ?>
@@ -53,7 +53,7 @@ require '../includes/admin_header.php';
 
 <div class="row g-4">
     <div class="col-lg-4">
-        <div class="card border-0 shadow-sm">
+        <div class="card">
             <div class="card-body p-4">
                 <h2 class="h6 fw-bold mb-3">Details</h2>
                 <dl class="small mb-0">
@@ -69,7 +69,7 @@ require '../includes/admin_header.php';
     </div>
 
     <div class="col-lg-6">
-        <div class="card border-0 shadow-sm">
+        <div class="card">
             <div class="card-body p-4">
                 <h2 class="h6 fw-bold mb-3">Change password</h2>
 

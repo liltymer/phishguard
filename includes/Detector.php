@@ -1,6 +1,6 @@
 <?php
 /**
- * PhishGuard detection engine.
+ * BaitCheck detection engine.
  *
  * Runs a set of rule-based checks on a URL. Each rule that matches adds
  * points to a risk score (0-100), and the score decides the verdict.
@@ -135,7 +135,7 @@ class Detector
 
         // Known lists come first: a blacklist match is final, a whitelist match is trusted
         if ($this->inList($host, $domain, $this->blacklist)) {
-            $this->flag('blacklist', 'This domain is on the PhishGuard blacklist of known phishing sites.', 100);
+            $this->flag('blacklist', 'This domain is on the BaitCheck blacklist of known phishing sites.', 100);
             return $this->result($host);
         }
 

@@ -1,4 +1,4 @@
--- PhishGuard: Phishing URL Detection System
+-- BaitCheck: Phishing URL Detection System
 -- PostgreSQL schema.
 --
 -- 1. In pgAdmin, create an empty database named "phishguard".

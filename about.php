@@ -17,61 +17,114 @@ $groupIcons = [
     'Wording'       => 'bi-chat-left-text',
 ];
 
-$pageTitle = 'How It Works | PhishGuard';
-$pageDescription = 'How PhishGuard checks links for phishing: the ' . count(Detector::RULES) . ' checks, the risk score and how to stay safe.';
+// Colour a rule's points like the result page does, using its highest value ("8 or 20" -> 20)
+$ruleSeverity = function (string $points): array {
+    preg_match_all('/\d+/', $points, $numbers);
+    return severity((int) max($numbers[0] ?: [0]));
+};
+
+$pageTitle = 'How It Works | BaitCheck';
+$pageDescription = 'How BaitCheck checks links for phishing: the ' . count(Detector::RULES) . ' checks, the risk score and how to stay safe.';
 $activePage = 'about';
 require 'includes/header.php';
 ?>
 
-<section class="hero text-light py-5">
-    <div class="container py-lg-3 text-center">
-        <h1 class="display-6 fw-bold mb-3">How PhishGuard works</h1>
-        <p class="lead text-light-50 mb-0 mx-auto about-lead">
-            PhishGuard inspects a link for the tricks scammers use, without ever opening the website,
+<section class="hero py-5">
+    <div class="hero-glow" aria-hidden="true"></div>
+    <div class="container py-lg-4 text-center position-relative">
+        <span class="hero-eyebrow rise"><span class="pulse-dot"></span> <?= count(Detector::RULES) ?> checks, explained</span>
+        <h1 class="hero-title hero-title-sm mt-4 mb-3 rise" style="--d: 80ms">How <span class="text-gradient text-shine">BaitCheck</span> works</h1>
+        <p class="lead text-soft mb-0 mx-auto about-lead rise" style="--d: 160ms">
+            BaitCheck inspects a link for the tricks scammers use, without ever opening the website,
             so checking a dangerous link is always safe.
         </p>
     </div>
 </section>
 
-<section class="container py-5">
-    <div class="row g-4 text-center">
+<section class="container section-pad pt-4">
+    <div class="section-head reveal">
+        <span class="section-eyebrow">The process</span>
+        <h2 class="section-title">Three steps, about one second</h2>
+    </div>
+    <?php require 'includes/steps.php'; ?>
+</section>
+
+<section class="container pb-5">
+    <div class="section-head reveal">
+        <span class="section-eyebrow">The risk score</span>
+        <h2 class="section-title">Every warning sign adds points</h2>
+        <p class="text-soft mt-2 mb-0">Points from every check are added together, up to a maximum of 100.</p>
+    </div>
+
+    <div class="score-legend reveal" aria-hidden="true">
+        <div class="score-track score-track-lg">
+            <div class="score-fill">
+                <span class="score-seg" style="width: <?= Detector::SUSPICIOUS_AT ?>%; background: var(--v-safe)"></span>
+                <span class="score-seg" style="width: <?= Detector::PHISHING_AT - Detector::SUSPICIOUS_AT ?>%; background: var(--v-suspicious)"></span>
+                <span class="score-seg" style="width: <?= 100 - Detector::PHISHING_AT ?>%; background: var(--v-phishing)"></span>
+            </div>
+        </div>
+        <div class="score-zones small">
+            <span style="width: <?= Detector::SUSPICIOUS_AT ?>%">0</span>
+            <span style="width: <?= Detector::PHISHING_AT - Detector::SUSPICIOUS_AT ?>%"><?= Detector::SUSPICIOUS_AT ?></span>
+            <span class="d-flex justify-content-between" style="width: <?= 100 - Detector::PHISHING_AT ?>%"><?= Detector::PHISHING_AT ?> <span class="border-0 p-0">100</span></span>
+        </div>
+    </div>
+
+    <div class="row g-3 mt-2">
         <?php
-        $steps = [
-            ['bi-clipboard-check', 'Paste a link', 'Copy a link from an SMS, email or WhatsApp message and paste it into the scanner.'],
-            ['bi-cpu', 'We run ' . count(Detector::RULES) . ' checks', 'Each warning sign adds points to a risk score. The link itself is never visited.'],
-            ['bi-clipboard-data', 'Get a clear verdict', 'You see the score, the real website behind the link and exactly why it was flagged.'],
+        $bands = [
+            ['safe', '0 to ' . (Detector::SUSPICIOUS_AT - 1)],
+            ['suspicious', Detector::SUSPICIOUS_AT . ' to ' . (Detector::PHISHING_AT - 1)],
+            ['phishing', Detector::PHISHING_AT . ' to 100'],
         ];
-        foreach ($steps as $i => [$icon, $title, $text]): ?>
-            <div class="col-md-4">
-                <div class="step-number"><?= $i + 1 ?></div>
-                <i class="bi <?= $icon ?> feature-icon d-block mb-2"></i>
-                <h2 class="h6 fw-bold"><?= $title ?></h2>
-                <p class="small text-muted mb-0"><?= $text ?></p>
+        foreach ($bands as $i => [$key, $range]): $info = verdictInfo($key); ?>
+            <div class="col-md-4 reveal" style="--d: <?= $i * 100 ?>ms">
+                <div class="card stat-card stat-<?= $info['color'] ?> verdict-<?= $key ?> h-100">
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <span class="stat-chip"><i class="bi <?= $info['icon'] ?>"></i></span>
+                            <span class="badge text-bg-<?= $info['color'] ?>"><?= $range ?></span>
+                        </div>
+                        <h3 class="h5 fw-bold text-verdict mb-2"><?= $info['label'] ?></h3>
+                        <p class="small text-muted mb-0"><?= $info['text'] ?></p>
+                    </div>
+                </div>
             </div>
         <?php endforeach; ?>
     </div>
 </section>
 
-<section class="bg-white py-5">
+<section class="section-alt section-pad">
     <div class="container">
-        <h2 class="h4 fw-bold text-center mb-2">The risk score</h2>
-        <p class="text-muted text-center mb-4">Points from every check are added together, up to a maximum of 100.</p>
-        <div class="row g-3 justify-content-center">
-            <?php
-            $bands = [
-                ['safe', '0 to ' . (Detector::SUSPICIOUS_AT - 1)],
-                ['suspicious', Detector::SUSPICIOUS_AT . ' to ' . (Detector::PHISHING_AT - 1)],
-                ['phishing', Detector::PHISHING_AT . ' to 100'],
-            ];
-            foreach ($bands as [$key, $range]): $info = verdictInfo($key); ?>
-                <div class="col-md-4">
-                    <div class="card stat-card stat-<?= $info['color'] ?> h-100">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <span class="fw-bold text-<?= $info['color'] ?>"><i class="bi <?= $info['icon'] ?>"></i> <?= $info['label'] ?></span>
-                                <span class="badge text-bg-light border"><?= $range ?></span>
+        <div class="section-head reveal">
+            <span class="section-eyebrow">What we check</span>
+            <h2 class="section-title">All <?= count(Detector::RULES) ?> checks</h2>
+            <p class="text-soft mt-2 mb-0">Websites on our trusted list (such as google.com) score 0 and skip these checks.</p>
+        </div>
+        <div class="row g-4">
+            <?php $i = 0; foreach ($groups as $group => $rules): ?>
+                <div class="col-lg-6 reveal" style="--d: <?= ($i++ % 2) * 100 ?>ms">
+                    <div class="card h-100 rules-card">
+                        <div class="card-body p-4">
+                            <div class="d-flex align-items-center gap-3 mb-3">
+                                <span class="icon-chip"><i class="bi <?= $groupIcons[$group] ?? 'bi-check2-square' ?>"></i></span>
+                                <div>
+                                    <h3 class="h6 fw-bold mb-0"><?= e($group) ?></h3>
+                                    <span class="small text-muted"><?= count($rules) ?> check<?= count($rules) === 1 ? '' : 's' ?></span>
+                                </div>
                             </div>
-                            <p class="small text-muted mb-0"><?= $info['text'] ?></p>
+                            <ul class="rule-list list-unstyled mb-0">
+                                <?php foreach ($rules as $rule): $s = $ruleSeverity($rule['points']); ?>
+                                    <li class="rule-row">
+                                        <div class="min-w-0">
+                                            <div class="rule-label"><?= e($rule['label']) ?></div>
+                                            <code class="rule-example"><?= e($rule['example']) ?></code>
+                                        </div>
+                                        <span class="badge text-bg-<?= $s['color'] ?> points-badge">+<?= e($rule['points']) ?></span>
+                                    </li>
+                                <?php endforeach; ?>
+                            </ul>
                         </div>
                     </div>
                 </div>
@@ -80,75 +133,70 @@ require 'includes/header.php';
     </div>
 </section>
 
-<section class="container py-5">
-    <h2 class="h4 fw-bold text-center mb-2">What we check</h2>
-    <p class="text-muted text-center mb-4">
-        Websites on our trusted list (such as google.com) score 0 and skip these checks.
-    </p>
+<section class="container section-pad">
     <div class="row g-4">
-        <?php foreach ($groups as $group => $rules): ?>
-            <div class="col-lg-6">
-                <div class="card border-0 shadow-sm h-100 rules-card">
-                    <div class="card-body p-4">
-                        <h3 class="h6 fw-bold mb-3"><i class="bi <?= $groupIcons[$group] ?? 'bi-check2-square' ?> text-accent-dark"></i> <?= e($group) ?></h3>
-                        <div class="table-responsive">
-                            <table class="table table-sm align-middle mb-0 rules-table">
-                                <thead><tr><th>Check</th><th>Example</th><th class="text-end">Points</th></tr></thead>
-                                <tbody>
-                                    <?php foreach ($rules as $rule): ?>
-                                        <tr>
-                                            <td><?= e($rule['label']) ?></td>
-                                            <td class="font-monospace small text-muted"><?= e($rule['example']) ?></td>
-                                            <td class="text-end text-nowrap fw-semibold">+<?= e($rule['points']) ?></td>
-                                        </tr>
-                                    <?php endforeach; ?>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+        <div class="col-lg-6 reveal">
+            <div class="card h-100">
+                <div class="card-body p-4 p-md-5">
+                    <span class="section-eyebrow">Community</span>
+                    <h2 class="h4 fw-bold mb-4">It learns from users</h2>
+                    <ol class="timeline list-unstyled mb-0">
+                        <li>
+                            <strong>Anyone can report a link</strong>
+                            <span><a href="report.php">Report a link</a> that BaitCheck missed, or a genuine site it flagged by mistake.</span>
+                        </li>
+                        <li>
+                            <strong>An administrator reviews it</strong>
+                            <span>Nothing changes until a person has checked the report.</span>
+                        </li>
+                        <li>
+                            <strong>Everyone is protected</strong>
+                            <span>Confirmed phishing domains go on the blacklist and score 100.
+                                Confirmed genuine sites go on the trusted list.</span>
+                        </li>
+                    </ol>
                 </div>
             </div>
-        <?php endforeach; ?>
+        </div>
+        <div class="col-lg-6 reveal" style="--d: 100ms">
+            <div class="card h-100">
+                <div class="card-body p-4 p-md-5">
+                    <span class="section-eyebrow">Stay safe</span>
+                    <h2 class="h4 fw-bold mb-4">How to stay safe</h2>
+                    <ul class="sign-list list-unstyled mb-0">
+                        <li><span class="icon-chip"><i class="bi bi-key"></i></span> Never share your PIN, password or MoMo code, whoever asks.</li>
+                        <li><span class="icon-chip"><i class="bi bi-alarm"></i></span> Be wary of urgent messages: "your account will be blocked today".</li>
+                        <li><span class="icon-chip"><i class="bi bi-keyboard"></i></span> Type your bank's address yourself instead of tapping a link.</li>
+                        <li><span class="icon-chip"><i class="bi bi-search"></i></span>
+                            <span>Look at the real domain: in <code>mtn.com.verify-now.xyz</code> it is <code>verify-now.xyz</code>.</span></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
     </div>
-</section>
 
-<section class="bg-white py-5">
-    <div class="container">
-        <div class="row g-4 g-lg-5">
-            <div class="col-lg-6">
-                <h2 class="h4 fw-bold mb-3"><i class="bi bi-people text-accent-dark"></i> It learns from users</h2>
-                <ol class="mb-0">
-                    <li class="mb-2">Anyone can <a href="report.php">report a link</a> that PhishGuard missed, or a genuine site it flagged by mistake.</li>
-                    <li class="mb-2">An administrator reviews each report.</li>
-                    <li>Confirmed phishing domains go on the <strong>blacklist</strong> and score 100 for everyone.
-                        Confirmed genuine sites go on the <strong>trusted list</strong>.</li>
-                </ol>
-            </div>
-            <div class="col-lg-6">
-                <h2 class="h4 fw-bold mb-3"><i class="bi bi-shield-check text-accent-dark"></i> How to stay safe</h2>
-                <ul class="mb-0">
-                    <li class="mb-2">Never share your PIN, password or MoMo code, whoever asks.</li>
-                    <li class="mb-2">Be wary of urgent messages: "your account will be blocked today".</li>
-                    <li class="mb-2">Type your bank's address yourself instead of tapping a link.</li>
-                    <li>Look at the real domain: in <code>mtn.com.verify-now.xyz</code> it is <code>verify-now.xyz</code>.</li>
-                </ul>
-            </div>
+    <div class="notice notice-info mt-4 reveal" role="note">
+        <span class="notice-icon"><i class="bi bi-info-lg"></i></span>
+        <div>
+            <strong>Limitations</strong>
+            <p class="small mb-0 mt-1">
+                BaitCheck looks for warning signs in the link itself. It does not open the website or read its content,
+                so a brand-new phishing site on an ordinary-looking domain may score low, and a genuine site can sometimes
+                be flagged. Treat a <strong>Safe</strong> result as "no warning signs found", not a guarantee, and
+                always think before entering personal details.
+            </p>
         </div>
     </div>
 </section>
 
-<section class="container py-5">
-    <div class="alert alert-light border mb-4">
-        <h2 class="h6 fw-bold"><i class="bi bi-info-circle"></i> Limitations</h2>
-        <p class="small mb-0">
-            PhishGuard looks for warning signs in the link itself. It does not open the website or read its content,
-            so a brand-new phishing site on an ordinary-looking domain may score low, and a genuine site can sometimes
-            be flagged. Treat a <strong>Safe</strong> result as "no warning signs found", not a guarantee, and
-            always think before entering personal details.
-        </p>
-    </div>
-    <div class="text-center">
-        <a href="index.php" class="btn btn-accent btn-lg px-4"><i class="bi bi-search"></i> Scan a link now</a>
+<section class="container pb-4">
+    <div class="cta-card reveal">
+        <div class="hero-glow" aria-hidden="true"></div>
+        <div class="position-relative text-center">
+            <h2 class="section-title mb-2">Ready to check a link?</h2>
+            <p class="text-soft mb-4">Paste it in and get a verdict in about a second.</p>
+            <a href="index.php" class="btn btn-accent btn-lg px-4"><i class="bi bi-search"></i> Scan a link now</a>
+        </div>
     </div>
 </section>
 

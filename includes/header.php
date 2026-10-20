@@ -1,9 +1,9 @@
 <?php
-$pageTitle = $pageTitle ?? 'PhishGuard';
+$pageTitle = $pageTitle ?? 'BaitCheck';
 $activePage = $activePage ?? '';
 $base = $base ?? '';   // '../' for pages inside a subfolder such as admin/
 $pageDescription = $pageDescription
-    ?? 'PhishGuard checks links for phishing before you click: paste a URL to get a risk score and a clear explanation.';
+    ?? 'BaitCheck checks links for phishing before you click: paste a URL to get a risk score and a clear explanation.';
 
 $navItems = [
     'scan'    => ['href' => 'index.php',   'label' => 'Scan URL'],
@@ -15,26 +15,23 @@ $navItems = [
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<?php require __DIR__ . '/head.php'; ?>
     <meta name="description" content="<?= htmlspecialchars($pageDescription) ?>">
-    <title><?= htmlspecialchars($pageTitle) ?></title>
-    <link rel="icon" href="<?= $base ?>assets/img/favicon.svg" type="image/svg+xml">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
-    <link href="<?= $base ?>assets/css/style.css" rel="stylesheet">
 </head>
 <body>
 <a href="#main" class="visually-hidden-focusable skip-link">Skip to content</a>
-<nav class="navbar navbar-expand-lg navbar-dark bg-navy">
+<nav class="navbar navbar-expand-lg site-nav sticky-top">
     <div class="container">
-        <a class="navbar-brand fw-bold" href="<?= $base ?>index.php">
-            <i class="bi bi-shield-lock-fill text-accent"></i> PhishGuard
+        <a class="navbar-brand brand" href="<?= $base ?>index.php">
+            <span class="brand-mark"><i class="bi bi-shield-fill-check"></i></span> <span>Bait<span class="text-gradient">Check</span></span>
         </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"
-                aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
+        <div class="d-flex align-items-center gap-1 order-lg-last ms-auto ms-lg-2">
+            <?php require __DIR__ . '/theme_toggle.php'; ?>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"
+                    aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+        </div>
         <div class="collapse navbar-collapse" id="mainNav">
             <ul class="navbar-nav ms-auto">
                 <?php foreach ($navItems as $key => $item): ?>

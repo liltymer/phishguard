@@ -87,21 +87,37 @@ function cleanDomain(string $input): ?string
     return ($isDomain || filter_var($host, FILTER_VALIDATE_IP)) ? $host : null;
 }
 
-// Label, Bootstrap colour, icon and advice for each verdict
+// Label, Bootstrap colour, icon, summary and next steps for each verdict
 function verdictInfo(string $verdict): array
 {
     $verdicts = [
         'safe' => [
             'label' => 'Looks Safe', 'short' => 'Safe', 'color' => 'success', 'icon' => 'bi-shield-check',
             'text'  => 'We found no strong signs of phishing. Still be careful before entering passwords or payment details.',
+            'advice' => [
+                'Check the address bar shows the website you expect before you log in.',
+                'Never share a PIN, password or one-time code (OTP), even on a genuine website.',
+                'If the message was urgent or sounded too good to be true, be extra careful anyway.',
+            ],
         ],
         'suspicious' => [
             'label' => 'Suspicious', 'short' => 'Suspicious', 'color' => 'warning', 'icon' => 'bi-exclamation-triangle',
             'text'  => 'This link has some warning signs. Do not enter personal information unless you are sure it is genuine.',
+            'advice' => [
+                'Do not open it from the message. Type the official website address yourself instead.',
+                'Check with the company or person through a phone number or app you already trust.',
+                'Never share a PIN, password or one-time code (OTP), whoever asks.',
+            ],
         ],
         'phishing' => [
             'label' => 'Likely Phishing', 'short' => 'Phishing', 'color' => 'danger', 'icon' => 'bi-shield-x',
             'text'  => 'This link shows strong signs of phishing. Do not open it or enter any information.',
+            'advice' => [
+                'Do not open the link, and do not enter any passwords, PINs or card details.',
+                'Delete the message, and block the sender if it came by SMS or WhatsApp.',
+                'Already entered your details? Change that password now and call your bank or mobile money provider.',
+                'If a friend sent it, warn them: their account may have been hacked.',
+            ],
         ],
     ];
 
@@ -138,4 +154,33 @@ function timeAgo(int $seconds): string
     }
 
     return 'just now';
+}
+
+/**
+ * "Defang" a link so it cannot be opened by accident when shared in a warning:
+ * http://paypal.com.evil.xyz/login -> hxxp://paypal[.]com[.]evil[.]xyz/login
+ */
+function defang(string $url): string
+{
+    [$scheme, $rest] = array_pad(explode('://', $url, 2), 2, '');
+    $hostEnd = strcspn($rest, '/?#');
+
+    return preg_replace('/^http/i', 'hxxp', $scheme) . '://'
+        . str_replace('.', '[.]', substr($rest, 0, $hostEnd)) . substr($rest, $hostEnd);
+}
+
+// Escape $text for HTML and wrap every match of $term in <mark>
+function highlight(string $text, string $term): string
+{
+    $parts = $term === '' ? false : preg_split('/(' . preg_quote($term, '/') . ')/iu', $text, -1, PREG_SPLIT_DELIM_CAPTURE);
+    if ($parts === false) {
+        return e($text);
+    }
+
+    $html = '';
+    foreach ($parts as $i => $part) {
+        $html .= $i % 2 ? '<mark>' . e($part) . '</mark>' : e($part);
+    }
+
+    return $html;
 }

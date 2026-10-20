@@ -50,23 +50,22 @@ $notice = match ($_GET['notice'] ?? '') {
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<?php
+    $pageTitle = 'Admin Login | BaitCheck';
+    $base = '../';
+    require '../includes/head.php';
+    ?>
     <meta name="robots" content="noindex, nofollow">
-    <title>Admin Login | PhishGuard</title>
-    <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
-    <link href="../assets/css/style.css" rel="stylesheet">
 </head>
 <body class="login-page">
+<div class="theme-toggle-corner"><?php require '../includes/theme_toggle.php'; ?></div>
 <main class="d-flex align-items-center justify-content-center px-3">
-    <div class="login-card card border-0 shadow">
+    <div class="login-card card">
         <div class="card-body p-4 p-md-5">
             <div class="text-center mb-4">
-                <i class="bi bi-shield-lock-fill text-accent display-5"></i>
+                <span class="brand-mark brand-mark-lg"><i class="bi bi-shield-fill-check"></i></span>
                 <h1 class="h4 fw-bold mt-2 mb-1">Admin Login</h1>
-                <p class="text-muted small mb-0">PhishGuard administration</p>
+                <p class="text-muted small mb-0">BaitCheck administration</p>
             </div>
 
             <?php if ($notice): ?>
@@ -93,10 +92,11 @@ $notice = match ($_GET['notice'] ?? '') {
             </form>
 
             <div class="text-center mt-4">
-                <a href="../index.php" class="small text-muted"><i class="bi bi-arrow-left"></i> Back to PhishGuard</a>
+                <a href="../index.php" class="small text-muted"><i class="bi bi-arrow-left"></i> Back to BaitCheck</a>
             </div>
         </div>
     </div>
 </main>
+<script src="../assets/js/main.js"></script>
 </body>
 </html>

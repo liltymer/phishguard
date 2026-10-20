@@ -50,7 +50,7 @@ $topDomains = $pdo->query("
 
 $series = ['safe', 'suspicious', 'phishing'];
 
-$pageTitle = 'Dashboard | PhishGuard Admin';
+$pageTitle = 'Dashboard | BaitCheck Admin';
 $activePage = 'dashboard';
 require '../includes/admin_header.php';
 ?>
@@ -89,7 +89,7 @@ require '../includes/admin_header.php';
 
 <div class="row g-4">
     <div class="col-lg-8">
-        <div class="card border-0 shadow-sm h-100">
+        <div class="card h-100">
             <div class="card-body p-4">
                 <div class="d-flex flex-wrap justify-content-between align-items-baseline gap-2 mb-3">
                     <h2 class="h6 fw-bold mb-0">Scans in the last 7 days</h2>
@@ -149,7 +149,7 @@ require '../includes/admin_header.php';
     </div>
 
     <div class="col-lg-4">
-        <div class="card border-0 shadow-sm mb-4">
+        <div class="card mb-4">
             <div class="card-body p-4">
                 <div class="d-flex justify-content-between align-items-baseline mb-3">
                     <h2 class="h6 fw-bold mb-0">Latest pending reports</h2>
@@ -170,7 +170,7 @@ require '../includes/admin_header.php';
             </div>
         </div>
 
-        <div class="card border-0 shadow-sm">
+        <div class="card">
             <div class="card-body p-4">
                 <h2 class="h6 fw-bold mb-3">Most detected phishing domains</h2>
                 <?php if (!$topDomains): ?>

@@ -6,7 +6,7 @@ http_response_code(404);
 require __DIR__ . '/includes/functions.php';
 
 $base = rtrim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'])), '/') . '/';
-$pageTitle = 'Page Not Found | PhishGuard';
+$pageTitle = 'Page Not Found | BaitCheck';
 require __DIR__ . '/includes/header.php';
 ?>
 

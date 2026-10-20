@@ -115,7 +115,7 @@ $typeInfo = [
 ];
 $statusColors = ['pending' => 'warning', 'confirmed' => 'success', 'rejected' => 'secondary'];
 
-$pageTitle = 'Reports | PhishGuard Admin';
+$pageTitle = 'Reports | BaitCheck Admin';
 $activePage = 'reports';
 require '../includes/admin_header.php';
 ?>
@@ -155,7 +155,7 @@ require '../includes/admin_header.php';
     $domain = $report['domain'];
     $registrable = Detector::registrableDomain($domain);
     $listName = $report['type'] === 'phishing' ? 'blacklist' : 'trusted list'; ?>
-    <div class="card border-0 shadow-sm mb-3 report-card">
+    <div class="card mb-3 report-card">
         <div class="card-body p-4">
             <div class="d-flex flex-wrap justify-content-between gap-2 mb-2">
                 <div class="d-flex flex-wrap gap-2 align-items-center">
@@ -176,7 +176,7 @@ require '../includes/admin_header.php';
 
             <?php if ($report['scan_verdict']): $v = verdictInfo($report['scan_verdict']); ?>
                 <p class="small text-muted mb-0">
-                    PhishGuard verdict at the time:
+                    BaitCheck verdict at the time:
                     <span class="badge text-bg-<?= $v['color'] ?>"><?= $v['short'] ?></span> (score <?= (int) $report['scan_score'] ?>)
                     <a href="../result.php?id=<?= (int) $report['scan_id'] ?>" target="_blank" rel="noopener">View scan</a>
                 </p>
