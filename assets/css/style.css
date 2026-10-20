@@ -2241,3 +2241,225 @@ mark {
 .sign-list code {
     font-size: 0.82em;
 }
+
+/* ======================================================================
+   Admin pages: segmented tabs, lists, report cards, account
+   ====================================================================== */
+.notice-warning { --tone: var(--v-suspicious); }
+
+/* Share bars take the card colour, or the verdict colour when there is no card colour */
+.share-bar > span {
+    background: var(--stat, var(--verdict));
+}
+
+/* Segmented tabs (status filters, list switcher) */
+.seg-tabs {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    padding: 4px;
+    border-radius: 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+}
+
+.seg-tabs a {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0.45rem 0.9rem;
+    border-radius: 9px;
+    font-size: 0.88rem;
+    font-weight: 500;
+    color: var(--muted);
+    text-decoration: none;
+    white-space: nowrap;
+    transition: background 0.15s, color 0.15s;
+}
+
+.seg-tabs a:hover {
+    color: var(--text);
+    background: var(--surface-2);
+}
+
+.seg-tabs a.active {
+    color: var(--text);
+    background: var(--surface-2);
+    box-shadow: inset 0 0 0 1px var(--border-strong);
+}
+
+.seg-tabs-sm a {
+    font-size: 0.8rem;
+    padding: 0.35rem 0.7rem;
+}
+
+.seg-count {
+    min-width: 20px;
+    padding: 0 6px;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-align: center;
+    background: var(--surface-2);
+    color: var(--muted);
+}
+
+.seg-tabs a.active .seg-count {
+    color: #fff;
+    background: var(--grad-button);
+}
+
+/* Dashboard side lists */
+.mini-list li,
+.rank-list li {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.mini-list li + li,
+.rank-list li + li {
+    margin-top: 0.9rem;
+}
+
+.rank-num {
+    flex-shrink: 0;
+    width: 26px;
+    height: 26px;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--muted);
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+}
+
+.rank-list li:first-child .rank-num {
+    color: #fff;
+    background: var(--grad-button);
+    border-color: transparent;
+}
+
+.rank-list .share-bar {
+    margin-top: 0.35rem;
+}
+
+/* Report cards */
+.report-card {
+    border-left: 3px solid color-mix(in srgb, var(--verdict) 70%, transparent);
+}
+
+.report-url {
+    font-size: 0.92rem;
+    font-weight: 600;
+}
+
+.report-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-top: 1.1rem;
+    padding-top: 1.1rem;
+    border-top: 1px solid var(--border);
+}
+
+.btn-confirm {
+    color: var(--bg);
+    background: var(--verdict);
+    border: none;
+    box-shadow: 0 6px 18px -8px var(--verdict);
+}
+
+.btn-confirm:hover,
+.btn-confirm:focus-visible {
+    color: var(--bg);
+    background: var(--verdict);
+    filter: brightness(1.08);
+}
+
+/* Domain lists */
+.domain-list li {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    padding: 0.85rem 1.15rem;
+    border-top: 1px solid var(--border);
+    transition: background 0.15s;
+}
+
+.domain-list li:first-child {
+    border-top: 0;
+}
+
+.domain-list li:hover {
+    background: var(--surface-2);
+}
+
+.domain-list .font-monospace {
+    font-size: 0.88rem;
+}
+
+.btn-icon-danger:hover,
+.btn-icon-danger:focus-visible {
+    color: #fff;
+    background: var(--v-phishing);
+    border-color: transparent;
+    transform: none;
+}
+
+/* Account */
+.avatar-xl {
+    width: 72px;
+    height: 72px;
+    font-size: 1.8rem;
+    display: flex;
+    box-shadow: 0 12px 30px -10px rgba(124, 58, 237, 0.7);
+}
+
+.profile-details > div {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.7rem 0;
+    border-top: 1px solid var(--border);
+}
+
+.profile-details dt {
+    font-weight: 500;
+    color: var(--muted);
+}
+
+.profile-details dd {
+    margin: 0;
+    font-weight: 600;
+    text-align: right;
+}
+
+.field-password .form-control {
+    padding-right: 2.75rem;
+}
+
+.btn-reveal {
+    position: absolute;
+    right: 6px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 34px;
+    height: 34px;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--muted);
+}
+
+.btn-reveal:hover,
+.btn-reveal:focus-visible {
+    color: var(--text);
+    background: var(--surface-2);
+}

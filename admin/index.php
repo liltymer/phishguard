@@ -55,55 +55,69 @@ $activePage = 'dashboard';
 require '../includes/admin_header.php';
 ?>
 
-<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
-    <h1 class="h3 fw-bold mb-0">Dashboard</h1>
-    <span class="text-muted small">Welcome back, <?= e($_SESSION['admin_username']) ?></span>
+<div class="page-head reveal">
+    <div>
+        <span class="section-eyebrow">Admin</span>
+        <h1 class="page-title">Dashboard</h1>
+        <p class="text-soft mb-0">Welcome back, <?= e($_SESSION['admin_username']) ?>. Here is what is happening on BaitCheck.</p>
+    </div>
+    <?php if ($stats['pending'] > 0): ?>
+        <a href="reports.php" class="btn btn-accent"><i class="bi bi-flag"></i> Review <?= (int) $stats['pending'] ?> report<?= $stats['pending'] > 1 ? 's' : '' ?></a>
+    <?php endif; ?>
 </div>
 
 <div class="row g-3 mb-4">
     <?php
     $cards = [
-        ['Total scans', $stats['scans'], 'bi-search', 'navy', null],
-        ['Phishing detected', $stats['phishing'], 'bi-shield-x', 'danger', null],
-        ['Pending reports', $stats['pending'], 'bi-flag', 'warning', 'reports.php'],
-        ['Blacklisted domains', $stats['blacklist'], 'bi-slash-circle', 'navy', 'lists.php?list=blacklist'],
+        ['Total scans', $stats['scans'], 'bi-search', 'navy', null, $weekTotal . ' in the last 7 days'],
+        ['Phishing detected', $stats['phishing'], 'bi-shield-x', 'danger', null, (int) $stats['suspicious'] . ' more were suspicious'],
+        ['Pending reports', $stats['pending'], 'bi-flag', 'warning', 'reports.php', $stats['pending'] ? 'Waiting for your review' : 'All caught up'],
+        ['Blacklisted domains', $stats['blacklist'], 'bi-slash-circle', 'navy', 'lists.php?list=blacklist', (int) $stats['whitelist'] . ' on the trusted list'],
     ];
-    foreach ($cards as [$label, $value, $icon, $color, $link]): ?>
-        <div class="col-6 col-lg-3">
-            <div class="card stat-card stat-<?= $color ?> h-100"><div class="card-body">
-                <div class="d-flex justify-content-between align-items-start">
-                    <div class="stat-value"><?= number_format((int) $value) ?></div>
-                    <i class="bi <?= $icon ?> stat-icon"></i>
+    foreach ($cards as $i => [$label, $value, $icon, $color, $link, $sub]): ?>
+        <div class="col-6 col-lg-3 reveal" style="--d: <?= $i * 80 ?>ms">
+            <div class="card stat-card stat-<?= $color ?> h-100 <?= $link ? 'stat-filter' : '' ?>">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <span class="stat-chip"><i class="bi <?= $icon ?>"></i></span>
+                        <?php if ($link): ?><i class="bi bi-arrow-up-right text-muted small" aria-hidden="true"></i><?php endif; ?>
+                    </div>
+                    <div class="stat-value" data-count="<?= (int) $value ?>"><?= number_format((int) $value) ?></div>
+                    <div class="fw-semibold small">
+                        <?php if ($link): ?>
+                            <a href="<?= $link ?>" class="stretched-link text-reset text-decoration-none"><?= $label ?></a>
+                        <?php else: ?>
+                            <?= $label ?>
+                        <?php endif; ?>
+                    </div>
+                    <div class="small text-muted"><?= e($sub) ?></div>
                 </div>
-                <div class="text-muted small">
-                    <?php if ($link): ?>
-                        <a href="<?= $link ?>" class="stretched-link text-reset text-decoration-none"><?= $label ?></a>
-                    <?php else: ?>
-                        <?= $label ?>
-                    <?php endif; ?>
-                </div>
-            </div></div>
+            </div>
         </div>
     <?php endforeach; ?>
 </div>
 
 <div class="row g-4">
-    <div class="col-lg-8">
+    <div class="col-lg-8 reveal" style="--d: 120ms">
         <div class="card h-100">
             <div class="card-body p-4">
-                <div class="d-flex flex-wrap justify-content-between align-items-baseline gap-2 mb-3">
-                    <h2 class="h6 fw-bold mb-0">Scans in the last 7 days</h2>
-                    <span class="text-muted small"><?= $weekTotal ?> total</span>
+                <div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-3">
+                    <div>
+                        <h2 class="h6 fw-bold mb-1">Scans in the last 7 days</h2>
+                        <span class="text-muted small"><?= $weekTotal ?> scan<?= $weekTotal === 1 ? '' : 's' ?> in total</span>
+                    </div>
+                    <ul class="chart-legend list-unstyled d-flex flex-wrap gap-3 small mb-0">
+                        <?php foreach ($series as $key): $info = verdictInfo($key); ?>
+                            <li><span class="swatch swatch-<?= $key ?>"></span> <?= $info['short'] ?></li>
+                        <?php endforeach; ?>
+                    </ul>
                 </div>
 
-                <ul class="chart-legend list-unstyled d-flex flex-wrap gap-3 small mb-3">
-                    <?php foreach ($series as $key): $info = verdictInfo($key); ?>
-                        <li><span class="swatch swatch-<?= $key ?>"></span> <i class="bi <?= $info['icon'] ?>"></i> <?= $info['short'] ?></li>
-                    <?php endforeach; ?>
-                </ul>
-
                 <?php if ($weekTotal === 0): ?>
-                    <p class="text-muted text-center py-5 mb-0">No scans in the last 7 days.</p>
+                    <div class="text-center py-5">
+                        <span class="icon-chip icon-chip-lg mx-auto"><i class="bi bi-bar-chart"></i></span>
+                        <p class="text-muted mb-0">No scans in the last 7 days.</p>
+                    </div>
                 <?php else: ?>
                     <div class="chart" role="img" aria-label="Stacked bar chart of scans per day by verdict. A table view follows.">
                         <div class="chart-tip" hidden></div>
@@ -148,21 +162,30 @@ require '../includes/admin_header.php';
         </div>
     </div>
 
-    <div class="col-lg-4">
-        <div class="card mb-4">
+    <div class="col-lg-4 d-flex flex-column gap-4">
+        <div class="card reveal" style="--d: 200ms">
             <div class="card-body p-4">
                 <div class="d-flex justify-content-between align-items-baseline mb-3">
                     <h2 class="h6 fw-bold mb-0">Latest pending reports</h2>
-                    <a href="reports.php" class="small">View all</a>
+                    <a href="reports.php" class="small link-arrow">View all <i class="bi bi-arrow-right"></i></a>
                 </div>
                 <?php if (!$pendingReports): ?>
-                    <p class="text-muted small mb-0"><i class="bi bi-check-circle text-success"></i> Nothing waiting for review.</p>
+                    <div class="d-flex align-items-center gap-3 small text-muted">
+                        <span class="url-avatar verdict-safe"><i class="bi bi-check-lg"></i></span>
+                        Nothing waiting for review.
+                    </div>
                 <?php else: ?>
-                    <ul class="list-unstyled mb-0">
-                        <?php foreach ($pendingReports as $report): ?>
-                            <li class="d-flex justify-content-between gap-2 py-2 border-bottom small">
-                                <span class="text-truncate font-monospace" title="<?= e($report['url']) ?>"><?= e($report['url']) ?></span>
-                                <span class="text-muted text-nowrap"><?= timeAgo((int) $report['age']) ?></span>
+                    <ul class="mini-list list-unstyled mb-0">
+                        <?php foreach ($pendingReports as $report):
+                            $isPhishing = $report['type'] === 'phishing'; ?>
+                            <li>
+                                <span class="url-avatar verdict-<?= $isPhishing ? 'phishing' : 'safe' ?>">
+                                    <i class="bi <?= $isPhishing ? 'bi-flag-fill' : 'bi-hand-thumbs-up-fill' ?>"></i>
+                                </span>
+                                <div class="min-w-0 flex-grow-1">
+                                    <div class="font-monospace small text-truncate" title="<?= e($report['url']) ?>"><?= e($report['url']) ?></div>
+                                    <div class="small text-muted"><?= $isPhishing ? 'Phishing report' : 'False alarm' ?> &middot; <?= timeAgo((int) $report['age']) ?></div>
+                                </div>
                             </li>
                         <?php endforeach; ?>
                     </ul>
@@ -170,17 +193,23 @@ require '../includes/admin_header.php';
             </div>
         </div>
 
-        <div class="card">
+        <div class="card flex-grow-1 reveal" style="--d: 280ms">
             <div class="card-body p-4">
                 <h2 class="h6 fw-bold mb-3">Most detected phishing domains</h2>
                 <?php if (!$topDomains): ?>
                     <p class="text-muted small mb-0">No phishing detected yet.</p>
-                <?php else: ?>
-                    <ol class="small ps-3 mb-0">
-                        <?php foreach ($topDomains as $row): ?>
-                            <li class="py-1">
-                                <span class="font-monospace"><?= e($row['domain']) ?></span>
-                                <span class="text-muted">(<?= (int) $row['n'] ?> scan<?= $row['n'] > 1 ? 's' : '' ?>)</span>
+                <?php else: $topMax = max(array_column($topDomains, 'n')); ?>
+                    <ol class="rank-list list-unstyled mb-0">
+                        <?php foreach ($topDomains as $rank => $row): ?>
+                            <li>
+                                <span class="rank-num"><?= $rank + 1 ?></span>
+                                <div class="min-w-0 flex-grow-1">
+                                    <div class="d-flex justify-content-between gap-2 small">
+                                        <span class="font-monospace text-truncate" title="<?= e($row['domain']) ?>"><?= e($row['domain']) ?></span>
+                                        <span class="text-muted text-nowrap"><?= (int) $row['n'] ?> scan<?= $row['n'] > 1 ? 's' : '' ?></span>
+                                    </div>
+                                    <div class="share-bar verdict-phishing" aria-hidden="true"><span style="width: <?= round($row['n'] / $topMax * 100) ?>%"></span></div>
+                                </div>
                             </li>
                         <?php endforeach; ?>
                     </ol>

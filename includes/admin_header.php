@@ -70,5 +70,5 @@ $adminNav = [
         </div>
     </div>
 </nav>
-<main id="main" class="container py-4">
+<main id="main" class="container page-section">
     <?= flashMessage() ?>

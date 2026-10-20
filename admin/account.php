@@ -49,53 +49,70 @@ $activePage = 'account';
 require '../includes/admin_header.php';
 ?>
 
-<h1 class="h3 fw-bold mb-4">Account</h1>
+<div class="page-head reveal">
+    <div>
+        <span class="section-eyebrow">Admin</span>
+        <h1 class="page-title">Account</h1>
+        <p class="text-soft mb-0">Your administrator details and password.</p>
+    </div>
+</div>
 
 <div class="row g-4">
-    <div class="col-lg-4">
-        <div class="card">
-            <div class="card-body p-4">
-                <h2 class="h6 fw-bold mb-3">Details</h2>
-                <dl class="small mb-0">
-                    <dt>Username</dt>
-                    <dd><?= e($admin['username']) ?></dd>
-                    <dt>Account created</dt>
-                    <dd><?= e($admin['created']) ?></dd>
-                    <dt>Current session started</dt>
-                    <dd class="mb-0"><?= e($admin['last_login'] ?? 'Unknown') ?></dd>
+    <div class="col-lg-4 reveal" style="--d: 80ms">
+        <div class="card profile-card h-100">
+            <div class="card-body p-4 text-center">
+                <span class="avatar avatar-xl mx-auto mb-3"><?= e(strtoupper(substr($admin['username'], 0, 1))) ?></span>
+                <h2 class="h5 fw-bold mb-1"><?= e($admin['username']) ?></h2>
+                <span class="badge bg-accent-soft">Administrator</span>
+                <dl class="profile-details text-start small mt-4 mb-0">
+                    <div><dt><i class="bi bi-calendar3"></i> Account created</dt><dd><?= e($admin['created']) ?></dd></div>
+                    <div><dt><i class="bi bi-clock-history"></i> Current session started</dt><dd><?= e($admin['last_login'] ?? 'Unknown') ?></dd></div>
                 </dl>
             </div>
         </div>
     </div>
 
-    <div class="col-lg-6">
-        <div class="card">
-            <div class="card-body p-4">
-                <h2 class="h6 fw-bold mb-3">Change password</h2>
+    <div class="col-lg-8 reveal" style="--d: 160ms">
+        <div class="card h-100">
+            <div class="card-body p-4 p-md-5">
+                <div class="d-flex align-items-center gap-3 mb-4">
+                    <span class="icon-chip"><i class="bi bi-key"></i></span>
+                    <div>
+                        <h2 class="h6 fw-bold mb-0">Change password</h2>
+                        <span class="small text-muted">You will stay signed in after changing it.</span>
+                    </div>
+                </div>
 
                 <?php if ($errors): ?>
-                    <div class="alert alert-danger small py-2" role="alert"><?= e($errors[0]) ?></div>
+                    <div class="notice notice-error mb-4" role="alert">
+                        <span class="notice-icon"><i class="bi bi-exclamation-lg"></i></span>
+                        <div><?= e($errors[0]) ?></div>
+                    </div>
                 <?php endif; ?>
 
                 <form method="POST">
                     <?= csrfField() ?>
-                    <div class="mb-3">
-                        <label for="current_password" class="form-label small fw-semibold">Current password</label>
-                        <input type="password" name="current_password" id="current_password" class="form-control"
-                               required autocomplete="current-password">
-                    </div>
-                    <div class="mb-3">
-                        <label for="new_password" class="form-label small fw-semibold">New password</label>
-                        <input type="password" name="new_password" id="new_password" class="form-control"
-                               required minlength="8" autocomplete="new-password">
-                        <div class="form-text">At least 8 characters.</div>
-                    </div>
-                    <div class="mb-4">
-                        <label for="confirm_password" class="form-label small fw-semibold">Confirm new password</label>
-                        <input type="password" name="confirm_password" id="confirm_password" class="form-control"
-                               required minlength="8" autocomplete="new-password">
-                    </div>
-                    <button class="btn btn-accent"><i class="bi bi-key"></i> Change password</button>
+                    <?php
+                    $fields = [
+                        ['current_password', 'Current password', 'current-password', ''],
+                        ['new_password', 'New password', 'new-password', 'At least 8 characters.'],
+                        ['confirm_password', 'Confirm new password', 'new-password', ''],
+                    ];
+                    foreach ($fields as [$name, $label, $autocomplete, $help]): ?>
+                        <div class="mb-3">
+                            <label for="<?= $name ?>" class="form-label small fw-semibold"><?= $label ?></label>
+                            <div class="field-icon field-password">
+                                <i class="bi bi-lock" aria-hidden="true"></i>
+                                <input type="password" name="<?= $name ?>" id="<?= $name ?>" class="form-control"
+                                       required <?= $name !== 'current_password' ? 'minlength="8"' : '' ?> autocomplete="<?= $autocomplete ?>">
+                                <button type="button" class="btn-reveal" data-toggle-password="<?= $name ?>" aria-label="Show password">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
+                            <?php if ($help): ?><div class="form-text"><?= $help ?></div><?php endif; ?>
+                        </div>
+                    <?php endforeach; ?>
+                    <button class="btn btn-accent mt-2"><i class="bi bi-check-lg"></i> Change password</button>
                 </form>
             </div>
         </div>

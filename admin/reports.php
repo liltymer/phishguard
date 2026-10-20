@@ -120,71 +120,92 @@ $activePage = 'reports';
 require '../includes/admin_header.php';
 ?>
 
-<h1 class="h3 fw-bold mb-4">User Reports</h1>
+<?php
+// Counts for the status tabs (all report types)
+$statusCounts = ['pending' => 0, 'confirmed' => 0, 'rejected' => 0];
+foreach ($pdo->query('SELECT status, COUNT(*) AS n FROM reports GROUP BY status') as $row) {
+    $statusCounts[$row['status']] = (int) $row['n'];
+}
+$statusCounts['all'] = array_sum($statusCounts);
+$filterLink = fn(array $changes) => 'reports.php?' . http_build_query(array_merge(['status' => $statusFilter, 'type' => $typeFilter], $changes));
+?>
 
-<form class="row g-2 mb-4" method="GET">
-    <div class="col-6 col-md-3">
-        <select name="status" class="form-select" aria-label="Filter by status">
-            <?php foreach (['pending' => 'Pending', 'confirmed' => 'Confirmed', 'rejected' => 'Rejected', 'all' => 'All statuses'] as $key => $label): ?>
-                <option value="<?= $key ?>" <?= $statusFilter === $key ? 'selected' : '' ?>><?= $label ?></option>
-            <?php endforeach; ?>
-        </select>
+<div class="page-head reveal">
+    <div>
+        <span class="section-eyebrow">Admin</span>
+        <h1 class="page-title">User reports</h1>
+        <p class="text-soft mb-0">Confirm a report to add the domain to the blacklist or trusted list, or reject it.</p>
     </div>
-    <div class="col-6 col-md-3">
-        <select name="type" class="form-select" aria-label="Filter by type">
-            <option value="all">All types</option>
-            <?php foreach ($typeInfo as $key => $info): ?>
-                <option value="<?= $key ?>" <?= $typeFilter === $key ? 'selected' : '' ?>><?= $info['label'] ?></option>
-            <?php endforeach; ?>
-        </select>
-    </div>
-    <div class="col-md-2 d-grid">
-        <button class="btn btn-accent"><i class="bi bi-funnel"></i> Filter</button>
-    </div>
-</form>
+</div>
+
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4 reveal" style="--d: 80ms">
+    <nav class="seg-tabs" aria-label="Filter by status">
+        <?php foreach (['pending' => 'Pending', 'confirmed' => 'Confirmed', 'rejected' => 'Rejected', 'all' => 'All'] as $key => $label): ?>
+            <a href="<?= e($filterLink(['status' => $key])) ?>" class="<?= $statusFilter === $key ? 'active' : '' ?>"
+               <?= $statusFilter === $key ? 'aria-current="page"' : '' ?>>
+                <?= $label ?> <span class="seg-count"><?= $statusCounts[$key] ?></span>
+            </a>
+        <?php endforeach; ?>
+    </nav>
+    <nav class="seg-tabs seg-tabs-sm" aria-label="Filter by type">
+        <a href="<?= e($filterLink(['type' => 'all'])) ?>" class="<?= $typeFilter === 'all' ? 'active' : '' ?>">All types</a>
+        <?php foreach ($typeInfo as $key => $info): ?>
+            <a href="<?= e($filterLink(['type' => $key])) ?>" class="<?= $typeFilter === $key ? 'active' : '' ?>">
+                <i class="bi <?= $info['icon'] ?>"></i> <?= $info['label'] ?>
+            </a>
+        <?php endforeach; ?>
+    </nav>
+</div>
 
 <?php if (!$reports): ?>
-    <div class="alert alert-light border text-center py-5">
-        <i class="bi bi-inbox display-6 d-block mb-2 text-muted"></i>
-        <?= $statusFilter === 'pending' ? 'No reports are waiting for review.' : 'No reports match these filters.' ?>
+    <div class="card text-center reveal">
+        <div class="card-body py-5">
+            <span class="icon-chip icon-chip-lg mx-auto"><i class="bi bi-inbox"></i></span>
+            <h2 class="h5 fw-bold mt-2"><?= $statusFilter === 'pending' ? 'All caught up' : 'No reports here' ?></h2>
+            <p class="text-muted mb-0"><?= $statusFilter === 'pending' ? 'No reports are waiting for review.' : 'No reports match these filters.' ?></p>
+        </div>
     </div>
 <?php endif; ?>
 
-<?php foreach ($reports as $report):
+<?php foreach ($reports as $n => $report):
     $type = $typeInfo[$report['type']];
     $domain = $report['domain'];
     $registrable = Detector::registrableDomain($domain);
     $listName = $report['type'] === 'phishing' ? 'blacklist' : 'trusted list'; ?>
-    <div class="card mb-3 report-card">
+    <div class="card report-card mb-3 row-in verdict-<?= $report['type'] === 'phishing' ? 'phishing' : 'safe' ?>" style="--d: <?= 120 + $n * 60 ?>ms">
         <div class="card-body p-4">
-            <div class="d-flex flex-wrap justify-content-between gap-2 mb-2">
-                <div class="d-flex flex-wrap gap-2 align-items-center">
-                    <span class="badge text-bg-<?= $type['color'] ?>"><i class="bi <?= $type['icon'] ?>"></i> <?= $type['label'] ?></span>
-                    <span class="badge text-bg-<?= $statusColors[$report['status']] ?>"><?= ucfirst($report['status']) ?></span>
-                    <span class="text-muted small">#<?= (int) $report['id'] ?> &middot; <?= timeAgo((int) $report['age']) ?></span>
+            <div class="d-flex gap-3">
+                <span class="url-avatar"><i class="bi <?= $type['icon'] ?>"></i></span>
+                <div class="min-w-0 flex-grow-1">
+                    <div class="d-flex flex-wrap justify-content-between gap-2 mb-1">
+                        <div class="d-flex flex-wrap gap-2 align-items-center">
+                            <span class="badge text-bg-<?= $type['color'] ?>"><?= $type['label'] ?></span>
+                            <span class="badge text-bg-<?= $statusColors[$report['status']] ?>"><?= ucfirst($report['status']) ?></span>
+                            <span class="text-muted small">#<?= (int) $report['id'] ?> &middot; <?= timeAgo((int) $report['age']) ?></span>
+                        </div>
+                        <?php if ($report['status'] === 'pending' && $report['similar'] > 1): ?>
+                            <span class="small text-muted"><i class="bi bi-people"></i> <?= (int) $report['similar'] ?> pending reports for this domain</span>
+                        <?php endif; ?>
+                    </div>
+
+                    <p class="report-url font-monospace text-break mb-2"><?= e($report['url']) ?></p>
+
+                    <?php if ($report['reason']): ?>
+                        <blockquote class="report-reason small mb-2"><?= nl2br(e($report['reason'])) ?></blockquote>
+                    <?php endif; ?>
+
+                    <?php if ($report['scan_verdict']): $v = verdictInfo($report['scan_verdict']); ?>
+                        <p class="small text-muted mb-0">
+                            BaitCheck verdict at the time:
+                            <span class="badge text-bg-<?= $v['color'] ?>"><?= $v['short'] ?></span> (score <?= (int) $report['scan_score'] ?>)
+                            <a href="../result.php?id=<?= (int) $report['scan_id'] ?>" target="_blank" rel="noopener" class="link-arrow">View scan <i class="bi bi-arrow-up-right"></i></a>
+                        </p>
+                    <?php endif; ?>
                 </div>
-                <?php if ($report['status'] === 'pending' && $report['similar'] > 1): ?>
-                    <span class="small text-muted"><i class="bi bi-people"></i> <?= (int) $report['similar'] ?> pending reports for this domain</span>
-                <?php endif; ?>
             </div>
 
-            <p class="font-monospace text-break mb-2"><?= e($report['url']) ?></p>
-
-            <?php if ($report['reason']): ?>
-                <blockquote class="report-reason small mb-2"><?= nl2br(e($report['reason'])) ?></blockquote>
-            <?php endif; ?>
-
-            <?php if ($report['scan_verdict']): $v = verdictInfo($report['scan_verdict']); ?>
-                <p class="small text-muted mb-0">
-                    BaitCheck verdict at the time:
-                    <span class="badge text-bg-<?= $v['color'] ?>"><?= $v['short'] ?></span> (score <?= (int) $report['scan_score'] ?>)
-                    <a href="../result.php?id=<?= (int) $report['scan_id'] ?>" target="_blank" rel="noopener">View scan</a>
-                </p>
-            <?php endif; ?>
-
             <?php if ($report['status'] === 'pending'): ?>
-                <hr>
-                <div class="d-flex flex-wrap align-items-end justify-content-between gap-3">
+                <div class="report-actions">
                     <form method="POST" class="d-flex flex-wrap align-items-end gap-2 m-0">
                         <?= csrfField() ?>
                         <input type="hidden" name="report_id" value="<?= (int) $report['id'] ?>">
@@ -200,7 +221,7 @@ require '../includes/admin_header.php';
                                 </select>
                             </div>
                         <?php endif; ?>
-                        <button class="btn btn-sm btn-<?= $type['color'] ?>"
+                        <button class="btn btn-sm btn-confirm"
                                 data-confirm="Confirm this report and add it to the <?= $listName ?>?">
                             <i class="bi bi-check-lg"></i> Confirm and add to <?= $listName ?>
                         </button>

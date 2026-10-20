@@ -58,10 +58,15 @@ function flashMessage(): string
 
     $flash = $_SESSION['flash'];
     unset($_SESSION['flash']);
-    $icon = $flash['type'] === 'success' ? 'bi-check-circle-fill' : 'bi-exclamation-triangle-fill';
+    [$tone, $icon] = match ($flash['type']) {
+        'success' => ['success', 'bi-check-lg'],
+        'danger'  => ['error', 'bi-exclamation-lg'],
+        'warning' => ['warning', 'bi-exclamation-lg'],
+        default   => ['info', 'bi-info-lg'],
+    };
 
-    return '<div class="alert alert-' . e($flash['type']) . ' d-flex gap-2" role="alert">'
-        . '<i class="bi ' . $icon . '"></i><div>' . e($flash['message']) . '</div></div>';
+    return '<div class="notice notice-' . $tone . ' mb-4" role="alert">'
+        . '<span class="notice-icon"><i class="bi ' . $icon . '"></i></span><div>' . e($flash['message']) . '</div></div>';
 }
 
 /**

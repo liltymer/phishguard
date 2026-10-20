@@ -403,6 +403,18 @@ document.addEventListener('click', (event) => {
     window.location.href = row.dataset.href;
 });
 
+// Show or hide a password field: <button data-toggle-password="fieldId">
+document.addEventListener('click', (event) => {
+    const button = event.target.closest('[data-toggle-password]');
+    if (!button) return;
+
+    const field = document.getElementById(button.dataset.togglePassword);
+    const show = field.type === 'password';
+    field.type = show ? 'text' : 'password';
+    button.querySelector('i').className = show ? 'bi bi-eye-slash' : 'bi bi-eye';
+    button.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+});
+
 // Press "/" to jump to a search box marked with data-shortcut="/"
 document.addEventListener('keydown', (event) => {
     if (event.key !== '/' || event.ctrlKey || event.metaKey || event.altKey) return;
