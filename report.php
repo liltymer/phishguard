@@ -52,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if (!$errors) {
-        $recent = $pdo->prepare('SELECT COUNT(*) FROM reports WHERE ip_address = ? AND created_at > NOW() - INTERVAL 1 HOUR');
+        $recent = $pdo->prepare("SELECT COUNT(*) FROM reports WHERE ip_address = ? AND created_at > now() - INTERVAL '1 hour'");
         $recent->execute([$ip]);
         if ($recent->fetchColumn() >= MAX_REPORTS_PER_HOUR) {
             $errors[] = 'You have sent several reports recently. Please wait a while before sending another.';

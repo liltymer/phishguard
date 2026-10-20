@@ -3,7 +3,7 @@ require 'config/db.php';
 require 'includes/functions.php';
 require 'includes/Detector.php';
 
-$stmt = db()->prepare('SELECT *, TIMESTAMPDIFF(SECOND, created_at, NOW()) AS age FROM scans WHERE id = ?');
+$stmt = db()->prepare('SELECT *, EXTRACT(EPOCH FROM now() - created_at)::int AS age FROM scans WHERE id = ?');
 $stmt->execute([(int) ($_GET['id'] ?? 0)]);
 $scan = $stmt->fetch();
 

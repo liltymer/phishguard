@@ -22,11 +22,11 @@ function confirmReport(PDO $pdo, array $report, string $target): int
     $pdo->beginTransaction();
     try {
         $pdo->prepare("DELETE FROM $removeFrom WHERE domain = ?")->execute([$target]);
-        $pdo->prepare("INSERT INTO $addTo (domain, note) VALUES (?, ?) ON DUPLICATE KEY UPDATE note = VALUES(note)")
+        $pdo->prepare("INSERT INTO $addTo (domain, note) VALUES (?, ?) ON CONFLICT (domain) DO UPDATE SET note = EXCLUDED.note")
             ->execute([$target, $note]);
 
         $close = $pdo->prepare("
-            UPDATE reports SET status = 'confirmed', reviewed_at = NOW()
+            UPDATE reports SET status = 'confirmed', reviewed_at = now()
             WHERE status = 'pending' AND type = ? AND (domain = ? OR domain LIKE ?)
         ");
         $close->execute([$report['type'], $target, '%.' . addcslashes($target, '%_\\')]);
@@ -58,7 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!$report) {
         setFlash('warning', 'That report has already been reviewed.');
     } elseif (($_POST['action'] ?? '') === 'reject') {
-        $pdo->prepare("UPDATE reports SET status = 'rejected', reviewed_at = NOW() WHERE id = ?")->execute([$report['id']]);
+        $pdo->prepare("UPDATE reports SET status = 'rejected', reviewed_at = now() WHERE id = ?")->execute([$report['id']]);
         setFlash('success', 'Report #' . $report['id'] . ' rejected. No lists were changed.');
     } elseif (($_POST['action'] ?? '') === 'confirm') {
         // The admin chooses between the exact host and the whole registrable domain
@@ -97,7 +97,7 @@ if ($typeFilter !== 'all') {
 $whereSql = $where ? 'WHERE ' . implode(' AND ', $where) : '';
 
 $stmt = $pdo->prepare("
-    SELECT r.*, TIMESTAMPDIFF(SECOND, r.created_at, NOW()) AS age,
+    SELECT r.*, EXTRACT(EPOCH FROM now() - r.created_at)::int AS age,
            s.verdict AS scan_verdict, s.score AS scan_score,
            (SELECT COUNT(*) FROM reports o WHERE o.domain = r.domain AND o.type = r.type AND o.status = 'pending') AS similar
     FROM reports r

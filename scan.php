@@ -21,7 +21,7 @@ $whitelist = $pdo->query('SELECT domain FROM whitelist')->fetchAll(PDO::FETCH_CO
 $result = (new Detector($blacklist, $whitelist))->analyze($url, $hadScheme);
 
 $stmt = $pdo->prepare(
-    'INSERT INTO scans (url, domain, score, verdict, reasons, ip_address) VALUES (?, ?, ?, ?, ?, ?)'
+    'INSERT INTO scans (url, domain, score, verdict, reasons, ip_address) VALUES (?, ?, ?, ?, ?, ?) RETURNING id'
 );
 $stmt->execute([
     $url,
@@ -32,5 +32,5 @@ $stmt->execute([
     $_SERVER['REMOTE_ADDR'] ?? null,
 ]);
 
-header('Location: result.php?id=' . $pdo->lastInsertId());
+header('Location: result.php?id=' . $stmt->fetchColumn());
 exit;

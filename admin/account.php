@@ -8,8 +8,8 @@ requireAdmin();
 $pdo = db();
 $stmt = $pdo->prepare("
     SELECT username, password_hash,
-           DATE_FORMAT(created_at, '%e %b %Y') AS created,
-           DATE_FORMAT(last_login_at, '%e %b %Y, %H:%i') AS last_login
+           to_char(created_at, 'FMDD Mon YYYY') AS created,
+           to_char(last_login_at, 'FMDD Mon YYYY, HH24:MI') AS last_login
     FROM admins WHERE id = ?
 ");
 $stmt->execute([$_SESSION['admin_id']]);

@@ -35,7 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } elseif ($inOther->fetchColumn()) {
             setFlash('danger', "\"$domain\" is on the {$lists[$other]['label']}. Remove it there first.");
         } else {
-            $insert = $pdo->prepare("INSERT IGNORE INTO $list (domain, note) VALUES (?, ?)");
+            $insert = $pdo->prepare("INSERT INTO $list (domain, note) VALUES (?, ?) ON CONFLICT (domain) DO NOTHING");
             $insert->execute([$domain, $note !== '' ? $note : null]);
             $insert->rowCount()
                 ? setFlash('success', "\"$domain\" added to the {$lists[$list]['label']}.")
@@ -62,7 +62,7 @@ foreach (array_keys($lists) as $key) {
 }
 
 $search = trim($_GET['q'] ?? '');
-$stmt = $pdo->prepare("SELECT id, domain, note, DATE_FORMAT(added_at, '%e %b %Y') AS added FROM $list WHERE domain LIKE ? ORDER BY added_at DESC, id DESC LIMIT 500");
+$stmt = $pdo->prepare("SELECT id, domain, note, to_char(added_at, 'FMDD Mon YYYY') AS added FROM $list WHERE domain ILIKE ? ORDER BY added_at DESC, id DESC LIMIT 500");
 $stmt->execute(['%' . addcslashes($search, '%_\\') . '%']);
 $entries = $stmt->fetchAll();
 

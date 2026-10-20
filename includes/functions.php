@@ -123,7 +123,7 @@ function severity(int $points): array
     return ['label' => 'Info', 'color' => 'success'];
 }
 
-// Takes an age in seconds (worked out by MySQL so PHP and MySQL time zones can't disagree)
+// Takes an age in seconds (worked out by the database so PHP and database time zones can't disagree)
 function timeAgo(int $seconds): string
 {
     if ($seconds < 60) {

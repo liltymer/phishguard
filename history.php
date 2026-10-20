@@ -28,7 +28,7 @@ if ($verdict !== 'all') {
     $params[] = $verdict;
 }
 if ($search !== '') {
-    $where[] = 'url LIKE ?';
+    $where[] = 'url ILIKE ?';
     $params[] = '%' . addcslashes($search, '%_\\') . '%';
 }
 $whereSql = $where ? 'WHERE ' . implode(' AND ', $where) : '';
@@ -41,7 +41,7 @@ $pages = max(1, (int) ceil($matching / PER_PAGE));
 $page = min($page, $pages);
 $offset = ($page - 1) * PER_PAGE;
 
-$stmt = $pdo->prepare("SELECT id, url, score, verdict, TIMESTAMPDIFF(SECOND, created_at, NOW()) AS age FROM scans $whereSql
+$stmt = $pdo->prepare("SELECT id, url, score, verdict, EXTRACT(EPOCH FROM now() - created_at)::int AS age FROM scans $whereSql
                        ORDER BY created_at DESC, id DESC LIMIT " . PER_PAGE . " OFFSET $offset");
 $stmt->execute($params);
 $scans = $stmt->fetchAll();

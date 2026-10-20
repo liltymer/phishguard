@@ -7,37 +7,45 @@ risk score with a verdict: **Safe**, **Suspicious** or **Phishing**.
 
 - HTML5, CSS3, Bootstrap 5
 - JavaScript
-- PHP 8
-- MySQL
+- PHP 8 (served by Apache from XAMPP)
+- PostgreSQL, managed with pgAdmin 4
 
-## Setup (XAMPP)
+## Setup
 
-1. Clone this repository into `C:\xampp\htdocs\phishguard`.
-2. Start **Apache** and **MySQL** in the XAMPP Control Panel.
-3. Open phpMyAdmin (`http://localhost/phpmyadmin`) and import `database/phishguard.sql`.
-4. Visit `http://localhost/phishguard`.
+You need XAMPP (for Apache and PHP) and PostgreSQL with pgAdmin 4.
+
+1. **Get the code.** Clone this repository into `C:\xampp\htdocs\phishguard`.
+2. **Enable PostgreSQL in PHP.** Open `C:\xampp\php\php.ini`, find these two lines and remove the
+   `;` at the start of each, then restart Apache in the XAMPP Control Panel:
+   ```
+   extension=pdo_pgsql
+   extension=pgsql
+   ```
+3. **Create the database.** In pgAdmin, right-click **Databases > Create > Database**, name it
+   `phishguard` and save. Then right-click the new database > **Query Tool**, open
+   `database/phishguard.sql` and press **Execute (F5)**.
+4. **Add your password.** Copy `config/config.example.php` to `config/config.local.php` and put your
+   PostgreSQL password in it. This file is ignored by git, so it is never uploaded.
+5. **Open the site** at `http://localhost/phishguard`.
 
 ### Creating an admin account
 
-There is no default admin password. Create an account from the command line
-(run the same command again later to reset a password):
+There is no default admin password. The first time you open `http://localhost/phishguard/admin`
+(also linked in the site footer), a setup page asks you to create the first admin account. It only
+works from the computer running the site, and disappears once an admin exists.
+
+To add another admin or reset a password, use the command line:
 
 ```
 C:\xampp\php\php.exe tools\create_admin.php <username> <password>
 ```
-
-Then log in at `http://localhost/phishguard/admin` (also linked in the site footer).
-
-### Upgrading an existing database
-
-If you imported the database before a feature was added, run the matching files in
-`database/migrations/` in number order. A fresh import of `phishguard.sql` already includes them.
 
 ## Project structure
 
 ```
 phishguard/
 ├── admin/
+│   ├── setup.php          First-run admin account creation
 │   ├── login.php          Admin login with lockout
 │   ├── index.php          Dashboard: statistics and 7-day chart
 │   ├── reports.php        Review user reports (confirm or reject)
@@ -47,10 +55,11 @@ phishguard/
 ├── assets/
 │   ├── css/style.css
 │   └── js/main.js
-├── config/db.php          Database connection
-├── database/
-│   ├── phishguard.sql     Full schema for fresh installs
-│   └── migrations/        Upgrades for existing databases
+├── config/
+│   ├── db.php             PostgreSQL connection
+│   ├── config.example.php Settings template (committed)
+│   └── config.local.php   Your password (not committed)
+├── database/phishguard.sql PostgreSQL schema
 ├── includes/
 │   ├── Detector.php       Detection engine (all phishing rules)
 │   ├── auth.php           Admin login, lockout and session timeout

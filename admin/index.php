@@ -17,8 +17,8 @@ $stats = $pdo->query("
         (SELECT COUNT(*) FROM whitelist)                          AS whitelist
 ")->fetch();
 
-// Scans per day for the last 7 days, using MySQL's date so time zones cannot disagree
-$today = new DateTime($pdo->query('SELECT CURDATE()')->fetchColumn());
+// Scans per day for the last 7 days, using the database's date so time zones cannot disagree
+$today = new DateTime($pdo->query('SELECT CURRENT_DATE')->fetchColumn());
 $days = [];
 for ($i = 6; $i >= 0; $i--) {
     $day = (clone $today)->modify("-$i day");
@@ -26,8 +26,8 @@ for ($i = 6; $i >= 0; $i--) {
                                     'safe' => 0, 'suspicious' => 0, 'phishing' => 0];
 }
 $rows = $pdo->query("
-    SELECT DATE(created_at) AS day, verdict, COUNT(*) AS n
-    FROM scans WHERE created_at >= CURDATE() - INTERVAL 6 DAY
+    SELECT created_at::date AS day, verdict, COUNT(*) AS n
+    FROM scans WHERE created_at >= CURRENT_DATE - INTERVAL '6 days'
     GROUP BY day, verdict
 ");
 foreach ($rows as $row) {
@@ -38,7 +38,7 @@ $maxDay = max(1, max($dayTotals));
 $weekTotal = array_sum($dayTotals);
 
 $pendingReports = $pdo->query("
-    SELECT id, url, type, TIMESTAMPDIFF(SECOND, created_at, NOW()) AS age
+    SELECT id, url, type, EXTRACT(EPOCH FROM now() - created_at)::int AS age
     FROM reports WHERE status = 'pending' ORDER BY created_at DESC LIMIT 5
 ")->fetchAll();
 

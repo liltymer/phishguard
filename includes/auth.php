@@ -8,7 +8,7 @@ const SESSION_TIMEOUT_SECONDS = 1800;
 function isLockedOut(string $ip): bool
 {
     $stmt = db()->prepare(
-        'SELECT COUNT(*) FROM login_attempts WHERE ip_address = ? AND attempted_at > NOW() - INTERVAL ' . LOCKOUT_MINUTES . ' MINUTE'
+        "SELECT COUNT(*) FROM login_attempts WHERE ip_address = ? AND attempted_at > now() - INTERVAL '" . LOCKOUT_MINUTES . " minutes'"
     );
     $stmt->execute([$ip]);
 
@@ -38,7 +38,7 @@ function attemptLogin(string $username, string $password, string $ip): bool
     }
 
     $pdo->prepare('DELETE FROM login_attempts WHERE ip_address = ?')->execute([$ip]);
-    $pdo->prepare('UPDATE admins SET last_login_at = NOW() WHERE id = ?')->execute([$admin['id']]);
+    $pdo->prepare('UPDATE admins SET last_login_at = now() WHERE id = ?')->execute([$admin['id']]);
 
     // New session ID on login prevents session fixation attacks
     startSession();

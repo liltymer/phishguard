@@ -29,11 +29,13 @@ if (strlen($password) < 8) {
     exit(1);
 }
 
+// xmax = 0 is PostgreSQL's way of telling a fresh insert apart from an update
 $stmt = db()->prepare(
     'INSERT INTO admins (username, password_hash) VALUES (?, ?)
-     ON DUPLICATE KEY UPDATE password_hash = VALUES(password_hash)'
+     ON CONFLICT (username) DO UPDATE SET password_hash = EXCLUDED.password_hash
+     RETURNING (xmax = 0) AS inserted'
 );
 $stmt->execute([$username, password_hash($password, PASSWORD_DEFAULT)]);
+$inserted = in_array($stmt->fetchColumn(), [true, 't', 1, '1'], true);
 
-// MySQL reports 1 row affected for an insert and 2 for an update
-echo $stmt->rowCount() === 1 ? "Admin \"$username\" created.\n" : "Password for \"$username\" updated.\n";
+echo $inserted ? "Admin \"$username\" created.\n" : "Password for \"$username\" updated.\n";

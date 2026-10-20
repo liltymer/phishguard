@@ -9,6 +9,12 @@ if (!preg_match('/^[a-z_]+\.php$/', $next)) {
     $next = 'index.php';
 }
 
+// Fresh install with no admin yet: go to first-run setup
+if ((int) db()->query('SELECT COUNT(*) FROM admins')->fetchColumn() === 0) {
+    header('Location: setup.php');
+    exit;
+}
+
 if (isLoggedIn()) {
     header('Location: ' . $next);
     exit;
