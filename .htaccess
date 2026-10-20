@@ -1,0 +1,5 @@
+# Custom "page not found" page. Update the path if the project folder is renamed.
+ErrorDocument 404 /phishguard/404.php
+
+# Do not list folder contents (for example assets/) in the browser
+Options -Indexes

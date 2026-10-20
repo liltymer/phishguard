@@ -1,4 +1,22 @@
 <?php
+require 'config/db.php';
+require 'includes/functions.php';
+require 'includes/Detector.php';
+
+$stats = db()->query("
+    SELECT
+        (SELECT COUNT(*) FROM scans)                            AS scans,
+        (SELECT COUNT(*) FROM scans WHERE verdict = 'phishing') AS phishing,
+        (SELECT COUNT(*) FROM blacklist)                        AS blacklist
+")->fetch();
+
+// Sample links for a quick demo, one per verdict
+$examples = [
+    ['https://www.google.com', 'Safe', 'success'],
+    ['https://mtn-promo.com', 'Suspicious', 'warning'],
+    ['http://paypa1.com/signin', 'Phishing', 'danger'],
+];
+
 $pageTitle = 'PhishGuard | Phishing URL Detection';
 $activePage = 'scan';
 require 'includes/header.php';
@@ -17,18 +35,49 @@ require 'includes/header.php';
                 <form id="scanForm" action="scan.php" method="POST" class="scan-form" novalidate>
                     <div class="input-group input-group-lg shadow">
                         <span class="input-group-text bg-white"><i class="bi bi-link-45deg"></i></span>
+                        <label for="urlInput" class="visually-hidden">URL to scan</label>
                         <input type="text" name="url" id="urlInput" class="form-control"
                                placeholder="https://example.com/login" autocomplete="off" required>
                         <button class="btn btn-accent px-4" type="submit">
                             <i class="bi bi-search"></i> Scan
                         </button>
                     </div>
-                    <div id="urlError" class="text-warning small mt-2 text-start <?= isset($_GET['error']) ? '' : 'd-none' ?>">
+                    <div id="urlError" class="text-warning small mt-2 text-start <?= isset($_GET['error']) ? '' : 'd-none' ?>" role="alert">
                         <?= isset($_GET['error']) ? 'That does not look like a valid web address. Please check it and try again.' : '' ?>
                     </div>
                 </form>
+
+                <div class="mt-3 small text-light-50">
+                    Try an example:
+                    <?php foreach ($examples as [$url, $label, $color]): ?>
+                        <button type="button" class="btn btn-sm btn-example ms-1" data-example="<?= e($url) ?>">
+                            <span class="dot bg-<?= $color ?>"></span> <?= $label ?>
+                        </button>
+                    <?php endforeach; ?>
+                </div>
             </div>
         </div>
+    </div>
+</section>
+
+<section class="container">
+    <div class="row g-3 stats-strip">
+        <?php
+        $strip = [
+            [$stats['scans'], 'links scanned', 'bi-search'],
+            [$stats['phishing'], 'phishing links caught', 'bi-shield-x'],
+            [count(Detector::RULES), 'checks on every link', 'bi-list-check'],
+        ];
+        foreach ($strip as [$value, $label, $icon]): ?>
+            <div class="col-4">
+                <div class="card border-0 shadow-sm text-center h-100">
+                    <div class="card-body py-3">
+                        <div class="stat-value"><?= number_format((int) $value) ?></div>
+                        <div class="small text-muted"><i class="bi <?= $icon ?>"></i> <?= $label ?></div>
+                    </div>
+                </div>
+            </div>
+        <?php endforeach; ?>
     </div>
 </section>
 
@@ -66,6 +115,9 @@ require 'includes/header.php';
             </div>
         </div>
     </div>
+    <p class="text-center mt-4 mb-0">
+        <a href="about.php" class="fw-semibold">See all <?= count(Detector::RULES) ?> checks and how scoring works <i class="bi bi-arrow-right"></i></a>
+    </p>
 </section>
 
 <?php require 'includes/footer.php'; ?>

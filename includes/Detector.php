@@ -11,6 +11,45 @@ class Detector
     const SUSPICIOUS_AT = 30;
     const PHISHING_AT   = 60;
 
+    // Every rule the engine can trigger, used to explain the checks on the How It Works page.
+    // Keep "points" in step with the flag() calls below (tests/detector_test.php checks the ids).
+    const RULES = [
+        'blacklist'      => ['group' => 'Known threats', 'label' => 'Domain is on the blacklist', 'points' => '100',
+                             'example' => 'A domain confirmed as phishing by an administrator'],
+        'typosquat'      => ['group' => 'Domain tricks', 'label' => 'Misspelt brand name', 'points' => '55',
+                             'example' => 'paypa1.com, faceb00k.com'],
+        'ip_address'     => ['group' => 'Domain tricks', 'label' => 'IP address instead of a domain name', 'points' => '45',
+                             'example' => 'http://192.168.4.21/login'],
+        'brand'          => ['group' => 'Domain tricks', 'label' => 'Brand name on a domain the brand does not own', 'points' => '35',
+                             'example' => 'paypal.com.verify-user.xyz'],
+        'at_symbol'      => ['group' => 'Domain tricks', 'label' => 'Hidden "@" before the real website', 'points' => '30',
+                             'example' => 'http://paypal.com@evil.com'],
+        'punycode'       => ['group' => 'Domain tricks', 'label' => 'Lookalike letters from other alphabets (punycode)', 'points' => '25',
+                             'example' => 'xn--pypal-4ve.com'],
+        'subdomains'     => ['group' => 'Domain tricks', 'label' => 'Many subdomains in front of the real domain', 'points' => '8 or 20',
+                             'example' => 'login.secure.account.evil.com'],
+        'hyphens'        => ['group' => 'Domain tricks', 'label' => 'Hyphens in the domain name', 'points' => '5 or 15',
+                             'example' => 'secure-login-bank.com'],
+        'tld'            => ['group' => 'Domain tricks', 'label' => 'Cheap ending often used for phishing', 'points' => '15',
+                             'example' => '.tk, .xyz, .top'],
+        'shortener'      => ['group' => 'URL structure', 'label' => 'Link shortener hiding the destination', 'points' => '20',
+                             'example' => 'bit.ly/3xYz12'],
+        'long_url'       => ['group' => 'URL structure', 'label' => 'Unusually long URL', 'points' => '8 or 15',
+                             'example' => 'More than 75 characters'],
+        'no_https'       => ['group' => 'URL structure', 'label' => 'No HTTPS encryption', 'points' => '10',
+                             'example' => 'http:// instead of https://'],
+        'port'           => ['group' => 'URL structure', 'label' => 'Unusual port number', 'points' => '10',
+                             'example' => 'example.com:8080'],
+        'redirect'       => ['group' => 'URL structure', 'label' => '"//" redirect inside the path', 'points' => '10',
+                             'example' => 'site.com//evil.com'],
+        'encoding'       => ['group' => 'URL structure', 'label' => 'Heavy use of encoded characters', 'points' => '10',
+                             'example' => '%2F%3A%40...'],
+        'keywords'       => ['group' => 'Wording', 'label' => 'Trick words such as login, verify or update', 'points' => '6 each, up to 20',
+                             'example' => '/account/verify'],
+        'keyword_domain' => ['group' => 'Wording', 'label' => 'Trick word inside the domain name itself', 'points' => '10',
+                             'example' => 'secure-update.com'],
+    ];
+
     // Brands that phishers commonly impersonate
     const BRANDS = [
         'paypal', 'google', 'facebook', 'apple', 'microsoft', 'amazon', 'netflix',

@@ -118,6 +118,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     input.addEventListener('input', () => error.classList.add('d-none'));
 
+    // "Try an example" buttons fill in a sample link and scan it
+    document.querySelectorAll('[data-example]').forEach((button) => {
+        button.addEventListener('click', () => {
+            input.value = button.dataset.example;
+            form.requestSubmit();
+        });
+    });
+
     function showError(message) {
         error.textContent = message;
         error.classList.remove('d-none');

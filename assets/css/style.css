@@ -65,6 +65,88 @@ main {
     color: var(--accent-dark);
 }
 
+.text-accent-dark {
+    color: var(--accent-dark);
+}
+
+.skip-link {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    z-index: 1100;
+    background: var(--accent);
+    color: var(--navy);
+    padding: 8px 14px;
+    border-radius: 6px;
+    font-weight: 600;
+}
+
+/* Home page: example buttons and stats strip overlapping the hero */
+.btn-example {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 999px;
+    padding: 2px 12px;
+}
+
+.btn-example:hover,
+.btn-example:focus-visible {
+    background: rgba(255, 255, 255, 0.2);
+    color: #fff;
+}
+
+.dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+.stats-strip {
+    margin-top: -1.75rem;
+    position: relative;
+}
+
+/* How It Works page */
+.about-lead {
+    max-width: 640px;
+}
+
+.step-number {
+    width: 32px;
+    height: 32px;
+    margin: 0 auto 0.75rem;
+    border-radius: 50%;
+    background: var(--navy);
+    color: var(--accent);
+    font-weight: 700;
+    line-height: 32px;
+}
+
+.rules-table th {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: #6c757d;
+    font-weight: 600;
+}
+
+.rules-table td {
+    font-size: 0.875rem;
+}
+
+/* Long monospace examples such as login.secure.account.evil.com may break onto a new line */
+.rules-table td.font-monospace {
+    overflow-wrap: anywhere;
+}
+
+@media (max-width: 575.98px) {
+    .rules-card .card-body {
+        padding: 1rem !important;
+    }
+}
+
 .result-card {
     border-width: 0 0 0 6px;
     border-radius: 12px;
